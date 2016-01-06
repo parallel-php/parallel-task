@@ -9,6 +9,11 @@ final class Executor
     /** @var TaskScheduler */
     private $taskScheduler;
 
+    public function __construct(TaskScheduler $taskScheduler)
+    {
+        $this->taskScheduler = $taskScheduler;
+    }
+
     /**
      * @param string $type
      * @param string $taskClass
