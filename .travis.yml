@@ -7,9 +7,12 @@ php:
   - hhvm
   - nightly
   - hhvm-nightly
-before_script:
-  - composer install
 matrix:
   allow_failures:
     - php: nightly
     - php: hhvm-nightly
+services:
+  - redis-server
+before_script:
+  - phpenv config-add travis-config.ini
+  - composer install
