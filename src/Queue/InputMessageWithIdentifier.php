@@ -1,8 +1,5 @@
 <?php
-namespace Queue;
-
-use ParallelTask\Queue\InputMessage;
-use ParallelTask\Queue\InputMessageIdentifier;
+namespace ParallelTask\Queue;
 
 class InputMessageWithIdentifier
 {

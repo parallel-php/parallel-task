@@ -1,8 +1,6 @@
 <?php
 namespace ParallelTask\Queue;
 
-use Queue\InputMessageWithIdentifier;
-
 abstract class NonCallbackQueue implements Queue
 {
     public final function run($type, callable $runCallback)
