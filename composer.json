@@ -22,8 +22,14 @@
     },
     "autoload": {
         "psr-4": {
-            "ParallelTask\\": "src/",
-            "ParallelTask\\Fixture\\": "test/Fixture/"
+            "ParallelTask\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ParallelTask\\Fixture\\": "test/Fixture/",
+            "ParallelTask\\": "test/"
+
         }
     }
 }
