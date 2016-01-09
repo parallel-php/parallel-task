@@ -13,6 +13,11 @@ class LocalArrayTestQueue implements Queue
 
     public function putInput($type, InputMessage $inputMessage)
     {
+        $this->submitInput($type, $inputMessage);
+    }
+
+    public function submitInput($type, InputMessage $inputMessage)
+    {
         if (!isset($this->storageInput[$type])) {
             $this->storageInput[$type] = [];
         }

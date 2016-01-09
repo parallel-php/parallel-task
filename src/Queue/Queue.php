@@ -4,13 +4,21 @@ namespace ParallelTask\Queue;
 interface Queue
 {
     /**
+     * Store an InputMessage that can be retrieved to run without capturing output.
+     *
+     * @param $type
+     * @param InputMessage $inputMessage
+     */
+    public function putInput($type, InputMessage $inputMessage);
+
+    /**
      * Store an InputMessage and receive and identifier to be able to retrieve the output when it is ready.
      *
      * @param $type
      * @param InputMessage $inputMessage
      * @return InputMessageIdentifier
      */
-    public function putInput($type, InputMessage $inputMessage);
+    public function submitInput($type, InputMessage $inputMessage);
 
     /**
      * The run method will fetch an InputMessage and after passing it to $runCallback will store the OutputMessage returned by it.

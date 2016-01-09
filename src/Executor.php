@@ -18,6 +18,17 @@ final class Executor
      * @param string $type
      * @param string $taskClass
      * @param array $parameters
+     */
+    public function execute($type, $taskClass, $parameters)
+    {
+        $taskInput = new TaskInput($parameters);
+        $this->taskScheduler->execute($type, $taskClass, $taskInput);
+    }
+
+    /**
+     * @param string $type
+     * @param string $taskClass
+     * @param array $parameters
      * @return FutureResult
      */
     public function submit($type, $taskClass, $parameters)

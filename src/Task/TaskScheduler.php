@@ -22,12 +22,23 @@ final class TaskScheduler
      * @param string $type
      * @param string $taskClass
      * @param TaskInput $taskInput
+     */
+    public function execute($type, $taskClass, TaskInput $taskInput)
+    {
+        $inputMessage = $this->taskMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
+        $this->queue->putInput($type, $inputMessage);
+    }
+
+    /**
+     * @param string $type
+     * @param string $taskClass
+     * @param TaskInput $taskInput
      * @return FutureTaskResult
      */
     public function submit($type, $taskClass, TaskInput $taskInput)
     {
         $inputMessage = $this->taskMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
-        $identifier = $this->queue->putInput($type, $inputMessage);
+        $identifier = $this->queue->submitInput($type, $inputMessage);
 
         $taskResultCallback = function () use($type, $identifier) {
             return $this->getTaskResult($type, $identifier);
