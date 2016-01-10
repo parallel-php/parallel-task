@@ -150,6 +150,7 @@ class RedisQueue extends NonCallbackQueue
                 $this->redis->rPush($this->getMessageQueueKey($type), $messageId);
                 $this->redis->lRem($this->getMessageRunKey($type), $messageId, 1);
                 $this->redis->hDel($this->getMessageStartTimeKey($type), $messageId);
+                $this->redis->exec();
             }
         }
     }
