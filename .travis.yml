@@ -14,6 +14,7 @@ matrix:
     - php: hhvm-nightly
 services:
   - redis-server
+  - rabbitmq
 before_script:
   - phpenv config-add travis-config.ini
   - composer install
