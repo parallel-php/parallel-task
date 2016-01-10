@@ -5,11 +5,15 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 {
 
     /** @var Queue */
-    private $queue;
+    private $queueClient;
+
+    /** @var Queue */
+    private $queueServer;
 
     protected function setUp()
     {
-        $this->queue = $this->getQueueInstance();
+        $this->queueClient = $this->getQueueInstance();
+        $this->queueServer = $this->getQueueInstance();
     }
 
     abstract protected function getQueueInstance();
@@ -21,9 +25,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $inputMessage = new InputMessage($data);
 
-        $this->queue->putInput($type, $inputMessage);
+        $this->queueClient->putInput($type, $inputMessage);
 
-        $this->queue->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture) {
+        $this->queueServer->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture) {
             $inputMessageCapture = $inputMessage;
             return new OutputMessage(null);
         });
@@ -38,9 +42,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $inputMessage = new InputMessage($data);
 
-        $identifier = $this->queue->submitInput($type, $inputMessage);
+        $identifier = $this->queueClient->submitInput($type, $inputMessage);
 
-        $this->queue->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture, &$outputMessageCapture) {
+        $this->queueServer->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture, &$outputMessageCapture) {
             $data = "testString122out";
             $outputMessage = new OutputMessage($data);
             $inputMessageCapture = $inputMessage;
@@ -48,7 +52,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             return $outputMessage;
         });
 
-        $outputMessage = $this->queue->getOutput($type, $identifier);
+        $outputMessage = $this->queueClient->getOutput($type, $identifier);
 
         $this->assertEquals($inputMessage->getData(), $inputMessageCapture->getData());
         $this->assertEquals($outputMessage->getData(), $outputMessageCapture->getData());
