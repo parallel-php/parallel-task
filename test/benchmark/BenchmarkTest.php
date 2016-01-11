@@ -21,8 +21,8 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
         ];
 
         $queueFactory = new QueueFactory();
-        $messageCount = 500;
-        $threadCount = 4;
+        $messageCount = 32;
+        $threadCount = 2;
         $type = 'benchmark-sum';
         $workerScript = __DIR__ . '/benchmark-worker.php';
 
