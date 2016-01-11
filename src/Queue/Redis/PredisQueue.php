@@ -56,7 +56,7 @@ class PredisQueue extends NonCallbackQueue
 
     private function storeInput($type, $id, $data, $captureResult)
     {
-        $this->redis->transaction(function (ClientContextInterface $redis) use ($type, $id, $data, $captureResult) {
+        $this->redis->pipeline(['atomic' => true], function (ClientContextInterface $redis) use ($type, $id, $data, $captureResult) {
             $redis->hset($this->getMessageKey($type), $id, $data);
             $redis->lpush($this->getMessageQueueKey($type), $id);
             $redis->hset($this->getMessageQueueTimeKey($type), $id, time());
@@ -102,7 +102,7 @@ class PredisQueue extends NonCallbackQueue
 
         $captureResult = 'MessageNotFinished' === $this->redis->hget($this->getMessageResultKey($type), $messageId);
 
-        $this->redis->transaction(function (ClientContextInterface $redis) use ($type, $messageId, $outputMessage, $captureResult) {
+        $this->redis->pipeline(['atomic' => true], function (ClientContextInterface $redis) use ($type, $messageId, $outputMessage, $captureResult) {
             $redis->lrem($this->getMessageRunKey($type), 0, $messageId);
             $redis->hdel($this->getMessageStartTimeKey($type), $messageId);
             $redis->lrem($this->getMessageQueueKey($type), 0, $messageId);
@@ -147,7 +147,7 @@ class PredisQueue extends NonCallbackQueue
         foreach ($messageIds as $messageId) {
             $time = $this->redis->hget($this->getMessageStartTimeKey($type), $messageId);
             if (!empty($time) && time() > $this->messageTimeout + (int)$time) {
-                $this->redis->transaction(function (ClientContextInterface $redis) use ($type, $messageId) {
+                $this->redis->pipeline(['atomic' => true], function (ClientContextInterface $redis) use ($type, $messageId) {
                     $redis->rpush($this->getMessageQueueKey($type), $messageId);
                     $redis->lrem($this->getMessageRunKey($type), 1, $messageId);
                     $redis->hdel($this->getMessageStartTimeKey($type), $messageId);
