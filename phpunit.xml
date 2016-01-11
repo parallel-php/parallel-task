@@ -10,6 +10,7 @@
     <testsuites>
         <testsuite name="Parallel Task Test Suite">
             <directory>test</directory>
+            <exclude>test/benchmark/BenchmarkTest.php</exclude>
         </testsuite>
     </testsuites>
 
