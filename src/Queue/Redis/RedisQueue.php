@@ -190,5 +190,9 @@ class RedisQueue extends NonCallbackQueue
         return 'thread-worker-result-' . $type;
     }
 
-
+    public function __destruct()
+    {
+        $this->redis->close();
+        unset($this->redis);
+    }
 }

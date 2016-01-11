@@ -44,4 +44,9 @@ class LocalArrayTestQueue implements Queue
     {
         return $this->storageOutput[$identifier->getId()];
     }
+
+    public function __destruct()
+    {
+        unset($this->storageInput, $this->storageOutput);
+    }
 }

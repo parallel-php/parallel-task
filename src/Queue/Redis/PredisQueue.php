@@ -191,5 +191,9 @@ class PredisQueue extends NonCallbackQueue
         return 'thread-worker-result-' . $type;
     }
 
-
+    public function __destruct()
+    {
+        $this->redis->disconnect();
+        unset($this->redis);
+    }
 }

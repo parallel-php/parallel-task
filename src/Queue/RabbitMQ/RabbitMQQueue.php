@@ -11,14 +11,20 @@ use Ramsey\Uuid\Uuid;
 
 class RabbitMQQueue implements Queue
 {
-
-    /**
-     * @var \AMQPChannel
-     */
+    /** @var AMQPStreamConnection */
+    private $connection;
+    /** @var \AMQPChannel */
     private $channel;
+    /** @var string */
+    private $replyQueueName;
+    /** @var OutputMessage[] */
+    private $outputMessages;
+    /** @var string */
+    private $consumerTag;
 
     public function __construct(AMQPStreamConnection $connection)
     {
+        $this->connection = $connection;
         $this->channel = $connection->channel();
     }
 
@@ -34,12 +40,26 @@ class RabbitMQQueue implements Queue
     {
         $this->declareQueue($type);
 
-        list($replyQueueName, ,) = $this->channel->queue_declare('', false, false, true, false);
+        if (is_null($this->replyQueueName)) {
+            list($this->replyQueueName, ,) = $this->channel->queue_declare('', false, false, true, false);
+            $replyCallbackCapture = function (AMQPMessage $amqpMessage) {
+                $outputMessage = new OutputMessage($amqpMessage->body);
+                $id = $amqpMessage->get('correlation_id');
+                $this->outputMessages[$id] = $outputMessage;
+                $channel = $amqpMessage->delivery_info['channel'];
+                $channel->basic_ack($amqpMessage->delivery_info['delivery_tag']);
+            };
 
-        $amqpMessage = new AMQPMessage($inputMessage->getData(), ['reply_to' => $replyQueueName]);
+            $this->channel->basic_qos(null, 1, null);
+            $this->channel->basic_consume($this->replyQueueName, '', false, false, true, false, $replyCallbackCapture);
+        }
+
+        $id = Uuid::uuid4()->toString();
+
+        $amqpMessage = new AMQPMessage($inputMessage->getData(), ['reply_to' => $this->replyQueueName, 'correlation_id' => $id]);
         $this->channel->basic_publish($amqpMessage, $this->getExchangeName($type));
 
-        return new InputMessageIdentifier($replyQueueName);
+        return new InputMessageIdentifier($id);
     }
 
     public function run($type, callable $runCallback)
@@ -53,35 +73,31 @@ class RabbitMQQueue implements Queue
 
             if ($amqpMessage->has('reply_to')) {
                 $replyQueueName = $amqpMessage->get('reply_to');
-                $replyAmqpMessage = new AMQPMessage($outputMessage->getData());
+                $id = $amqpMessage->get('correlation_id');
+                $replyAmqpMessage = new AMQPMessage($outputMessage->getData(), ['correlation_id' => $id]);
                 $channel->basic_publish($replyAmqpMessage, '', $replyQueueName);
             }
 
             $channel->basic_ack($amqpMessage->delivery_info['delivery_tag']);
         };
 
-        $consumerTag = 'consumer_' . substr(Uuid::uuid4()->toString(), 0, 8);
-        $this->channel->basic_qos(null, 1, null);
-        $this->channel->basic_consume($this->getQueueName($type), $consumerTag, false, false, false, false, $runCallbackWrapper);
+        if (is_null($this->consumerTag)) {
+            $this->consumerTag = 'consumer_' . substr(Uuid::uuid4()->toString(), 0, 8);
+            $this->channel->basic_qos(null, 1, null);
+            $this->channel->basic_consume($this->getQueueName($type), $this->consumerTag, false, false, false, false, $runCallbackWrapper);
+        }
         $this->channel->wait();
-        $this->channel->basic_cancel($consumerTag);
-
     }
 
     public function getOutput($type, InputMessageIdentifier $identifier)
     {
-        $replyQueueName = $identifier->getId();
+        $id = $identifier->getId();
 
-        $outputMessage = null;
-        $outputCallbackCapture = function (AMQPMessage $amqpMessage) use (&$outputMessage) {
-            $outputMessage = new OutputMessage($amqpMessage->body);
-        };
+        do {
+            $this->channel->wait();
+        } while (!isset($this->outputMessages[$id]));
 
-        $this->channel->basic_qos(null, 1, null);
-        $this->channel->basic_consume($replyQueueName, '', false, false, true, false, $outputCallbackCapture);
-        $this->channel->wait();
-
-        return $outputMessage;
+        return $this->outputMessages[$id];
     }
 
     private function declareQueue($type)
@@ -102,5 +118,17 @@ class RabbitMQQueue implements Queue
     private function getQueueName($type)
     {
         return $type . '_q';
+    }
+
+    public function __destruct()
+    {
+        $this->channel->close();
+        unset($this->channel);
+        $this->connection->close();
+        unset($this->connection);
+
+        unset($this->replyQueueName);
+        unset($this->consumerTag);
+        unset($this->outputMessages);
     }
 }
