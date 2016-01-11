@@ -66,29 +66,37 @@ class RabbitMQQueue implements Queue
 
     public function run($type, callable $runCallback)
     {
-        $runCallbackWrapper = function (AMQPMessage $amqpMessage) use ($runCallback) {
-            $inputMessage = new InputMessage($amqpMessage->body);
-            /** @var OutputMessage $outputMessage */
-            $outputMessage = $runCallback($inputMessage);
-
-            $channel = $amqpMessage->delivery_info['channel'];
-
-            if ($amqpMessage->has('reply_to')) {
-                $replyQueueName = $amqpMessage->get('reply_to');
-                $id = $amqpMessage->get('correlation_id');
-                $replyAmqpMessage = new AMQPMessage($outputMessage->getData(), ['correlation_id' => $id]);
-                $channel->basic_publish($replyAmqpMessage, '', $replyQueueName);
-            }
-
-            $channel->basic_ack($amqpMessage->delivery_info['delivery_tag']);
-        };
+        static $wrapperPassingRunCallback;
+        if (!isset($wrapperPassingRunCallback)) {
+            $wrapperPassingRunCallback = [];
+        }
 
         if (is_null($this->consumerTag)) {
+            $runCallbackWrapper = function (AMQPMessage $amqpMessage) use (&$wrapperPassingRunCallback) {
+                $inputMessage = new InputMessage($amqpMessage->body);
+                $runCallback = $wrapperPassingRunCallback['runCallback'];
+                /** @var OutputMessage $outputMessage */
+                $outputMessage = $runCallback($inputMessage);
+
+                $channel = $amqpMessage->delivery_info['channel'];
+
+                if ($amqpMessage->has('reply_to')) {
+                    $replyQueueName = $amqpMessage->get('reply_to');
+                    $id = $amqpMessage->get('correlation_id');
+                    $replyAmqpMessage = new AMQPMessage($outputMessage->getData(), ['correlation_id' => $id]);
+                    $channel->basic_publish($replyAmqpMessage, '', $replyQueueName);
+                }
+
+                $channel->basic_ack($amqpMessage->delivery_info['delivery_tag']);
+            };
             $this->consumerTag = 'consumer_' . substr(Uuid::uuid4()->toString(), 0, 8);
             $this->channel->basic_qos(null, 1, null);
             $this->channel->basic_consume($this->getQueueName($type), $this->consumerTag, false, false, false, false, $runCallbackWrapper);
         }
+
+        $wrapperPassingRunCallback['runCallback'] = $runCallback;
         $this->channel->wait();
+        unset($wrapperPassingRunCallback['runCallback']);
     }
 
     public function getOutput($type, InputMessageIdentifier $identifier)

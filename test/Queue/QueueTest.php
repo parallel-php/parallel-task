@@ -139,4 +139,34 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dataOut1, $outputMessage1->getData());
     }
 
+    public function testDifferentCallbacks()
+    {
+        $type = 'test5';
+        $dataIn1 = "testString1251in";
+        $dataIn2 = "testString1252in";
+        $dataOut1 = "testString1251out";
+        $dataOut2 = "testString1252out";
+
+        $runCallback1 = function (InputMessage $inputMessage) use ($dataOut1) {
+            return new OutputMessage($dataOut1);
+        };
+        $runCallback2 = function (InputMessage $inputMessage) use ($dataOut2) {
+            return new OutputMessage($dataOut2);
+        };
+
+        $inputMessage1 = new InputMessage($dataIn1);
+        $identifier1 = $this->queueClient->submitInput($type, $inputMessage1);
+        $this->queueServer->run($type, $runCallback1);
+        $outputMessage1 = $this->queueClient->getOutput($type, $identifier1);
+
+        $inputMessage2 = new InputMessage($dataIn2);
+        $identifier2 = $this->queueClient->submitInput($type, $inputMessage2);
+        $this->queueServer->run($type, $runCallback2);
+        $outputMessage2 = $this->queueClient->getOutput($type, $identifier2);
+
+        $this->assertEquals($dataOut1, $outputMessage1->getData());
+        $this->assertEquals($dataOut2, $outputMessage2->getData());
+    }
+
+
 }
