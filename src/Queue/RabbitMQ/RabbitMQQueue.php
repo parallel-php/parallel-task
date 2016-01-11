@@ -21,6 +21,8 @@ class RabbitMQQueue implements Queue
     private $outputMessages;
     /** @var string */
     private $consumerTag;
+    /** @var bool[] */
+    private $declaredQueue;
 
     public function __construct(AMQPStreamConnection $connection)
     {
@@ -102,12 +104,16 @@ class RabbitMQQueue implements Queue
 
     private function declareQueue($type)
     {
+        if (isset($this->declaredQueue[$type])) {
+            return;
+        }
         $exchangeName = $this->getExchangeName($type);
         $queueName = $this->getQueueName($type);
 
         $this->channel->exchange_declare($exchangeName, 'direct');
         $this->channel->queue_declare($queueName, false, false, false, false);
         $this->channel->queue_bind($queueName, $exchangeName);
+        $this->declaredQueue[$type] = true;
     }
 
     private function getExchangeName($type)
