@@ -95,11 +95,13 @@ class RabbitMQQueue implements Queue
     {
         $id = $identifier->getId();
 
-        do {
+        while (!isset($this->outputMessages[$id])) {
             $this->channel->wait();
-        } while (!isset($this->outputMessages[$id]));
+        }
 
-        return $this->outputMessages[$id];
+        $outputMessage = $this->outputMessages[$id];
+        unset($this->outputMessages[$id]);
+        return $outputMessage;
     }
 
     private function declareQueue($type)

@@ -110,7 +110,33 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($outputMessage1->getData(), $outputMessageCapture1->getData());
         $this->assertEquals($inputMessage2->getData(), $inputMessageCapture2->getData());
         $this->assertEquals($outputMessage2->getData(), $outputMessageCapture2->getData());
+    }
 
+    public function testInvertedMessageOrder()
+    {
+        $type = 'test4';
+        $dataIn1 = "testString1241in";
+        $dataIn2 = "testString1242in";
+        $dataOut1 = "testString1241out";
+        $dataOut2 = "testString1242out";
+
+        $runCallback = function (InputMessage $inputMessage) {
+            $data = substr($inputMessage->getData(), 0, -2) . 'out';
+            $outputMessage = new OutputMessage($data);
+            return $outputMessage;
+        };
+
+        $inputMessage1 = new InputMessage($dataIn1);
+        $inputMessage2 = new InputMessage($dataIn2);
+        $identifier1 = $this->queueClient->submitInput($type, $inputMessage1);
+        $identifier2 = $this->queueClient->submitInput($type, $inputMessage2);
+        $this->queueServer->run($type, $runCallback);
+        $this->queueServer->run($type, $runCallback);
+        $outputMessage2 = $this->queueClient->getOutput($type, $identifier2);
+        $outputMessage1 = $this->queueClient->getOutput($type, $identifier1);
+
+        $this->assertEquals($dataOut2, $outputMessage2->getData());
+        $this->assertEquals($dataOut1, $outputMessage1->getData());
     }
 
 }
