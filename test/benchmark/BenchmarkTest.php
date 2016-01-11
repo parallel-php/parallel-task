@@ -1,8 +1,6 @@
 <?php
 namespace ParallelTask\Benchmark;
 
-use ParallelTask\Benchmark\QueueFactory;
-use ParallelTask\Benchmark\SumTask;
 use ParallelTask\Executor;
 use ParallelTask\FutureResult;
 use ParallelTask\Task\TaskMessageTransformer;
@@ -40,7 +38,7 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
                 $thread->start();
                 $threads[] = $thread;
             }
-            sleep(1);
+            sleep(2);
 
             $stopwatch = Stopwatch::createStarted();
 
@@ -49,24 +47,29 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
             for ($i = 0; $i < $messageCount; $i++) {
                 $futureResults[] = $executor->submit($type, SumTask::class, [$i, $i + 1]);
             }
+            $stopwatch->pause();
+            $submitTime = $stopwatch->getElapsedSeconds();
+            $stopwatch->resume();
+
             foreach ($futureResults as $futureResult) {
                 $futureResult->getResult();
             }
 
             $stopwatch->stop();
+            $totalTime = $stopwatch->getElapsedSeconds();
 
             foreach ($threads as $thread) {
                 $thread->stop();
             }
 
-            $elapsed = $stopwatch->getElapsedSeconds();
-            $results[$queueType] = $elapsed;
+            $results[$queueType] = [$totalTime, $submitTime];
         }
 
-        foreach ($results as $queueType => $elapsed) {
-            $this->assertGreaterThan(0, $elapsed);
-            $elapsed = number_format($elapsed, 2);
-            echo "{$queueType}: {$elapsed}\n";
+        foreach ($results as $queueType => list($totalTime, $submitTime)) {
+            $this->assertGreaterThan(0, $totalTime);
+            $totalTime = number_format($totalTime, 2);
+            $submitTime = number_format($submitTime, 2);
+            echo "{$queueType}: total = {$totalTime} seconds, submit = {$submitTime} seconds\n";
         }
     }
 }
