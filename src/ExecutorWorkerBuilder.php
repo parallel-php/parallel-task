@@ -2,6 +2,7 @@
 namespace ParallelTask;
 
 use ParallelTask\Queue\Queue;
+use ParallelTask\Task\TaskFactory;
 use ParallelTask\Task\TaskFactorySimple;
 use ParallelTask\Task\TaskInputMessageTransformer;
 use ParallelTask\Task\TaskMessageSerializeTransformer;
@@ -11,9 +12,13 @@ use ParallelTask\Task\TaskScheduler;
 
 class ExecutorWorkerBuilder
 {
+    /** @var Queue */
     private $queue;
+    /** @var TaskInputMessageTransformer */
     private $taskInputMessageTransformer;
+    /** @var TaskResultMessageTransformer */
     private $taskResultMessageTransformer;
+    /** @var TaskFactory */
     private $taskFactory;
 
     public function __construct()
@@ -53,6 +58,15 @@ class ExecutorWorkerBuilder
         return $this;
     }
 
+    /**
+     * @param TaskFactory $taskFactory
+     * @return ExecutorWorkerBuilder
+     */
+    public function withTaskFactory(TaskFactory $taskFactory)
+    {
+        $this->taskFactory = $taskFactory;
+        return $this;
+    }
 
     /**
      * @return Executor
