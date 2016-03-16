@@ -4,7 +4,7 @@ namespace ParallelTask\Task;
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\OutputMessage;
 
-class TaskMessageSerializeTransformer implements TaskInputMessageTransformer, TaskResultMessageTransformer
+final class TaskMessageSerializeTransformer implements TaskInputMessageTransformer, TaskResultMessageTransformer
 {
     public function getInputMessageFromTaskInput($taskClass, TaskInput $taskInput)
     {

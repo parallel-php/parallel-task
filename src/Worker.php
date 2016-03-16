@@ -1,9 +1,6 @@
 <?php
 namespace ParallelTask;
 
-use ParallelTask\Queue\Queue;
-use ParallelTask\Task\TaskFactorySimple;
-use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskRunner;
 
 final class Worker
@@ -15,7 +12,6 @@ final class Worker
     {
         $this->taskRunner = $taskRunner;
     }
-
 
     /**
      * @param string $type

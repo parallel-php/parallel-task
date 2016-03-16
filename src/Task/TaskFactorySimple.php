@@ -1,7 +1,7 @@
 <?php
 namespace ParallelTask\Task;
 
-class TaskFactorySimple implements TaskFactory
+final class TaskFactorySimple implements TaskFactory
 {
     public function createTask($taskClass)
     {

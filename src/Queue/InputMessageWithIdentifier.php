@@ -1,7 +1,7 @@
 <?php
 namespace ParallelTask\Queue;
 
-class InputMessageWithIdentifier
+final class InputMessageWithIdentifier
 {
     /** @var InputMessageIdentifier */
     private $identifier;

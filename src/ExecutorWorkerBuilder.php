@@ -27,7 +27,6 @@ class ExecutorWorkerBuilder
         $this->taskFactory = new TaskFactorySimple();
     }
 
-
     /**
      * @param Queue $queue
      * @return ExecutorWorkerBuilder

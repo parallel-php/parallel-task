@@ -1,10 +1,7 @@
 <?php
 namespace ParallelTask\Task;
 
-use ParallelTask\Queue\InputMessageIdentifier;
-use ParallelTask\Queue\Queue;
-
-class FutureTaskResult
+final class FutureTaskResult
 {
     /** @var \Closure */
     private $taskResultCallback;
