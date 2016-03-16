@@ -3,6 +3,11 @@ parallel-php/parallel-task [![Build Status](https://travis-ci.org/parallel-php/p
 
 Library for running parallel php tasks in a simple and intuitive way across multiple computers.
 
+What can be done with it:
+- Delegate tasks in order to improve application response time. For example, instead of sending an email inline, it can be sent asynchronously.
+- Delegate tasks whose result is not required to be immediatly visible or for which a reponse is not needed in the current script. Examples here can range from simple things like logging up to complex application logic that can be processed with delay in order to improve high peak performance.
+- Parallel processing. An algorithm that can be parallelized can benefit from this library by starting multiple workers on different machines and agregate the results after all finished.
+
 How to use it:
 
 - Choose a queue implementation and create an instance of it. Existing implementations: Redis and RabbitMQ. Help with more implementations is appreciated.
