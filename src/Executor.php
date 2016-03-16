@@ -1,7 +1,9 @@
 <?php
 namespace ParallelTask;
 
+use ParallelTask\Queue\Queue;
 use ParallelTask\Task\TaskInput;
+use ParallelTask\Task\TaskMessageTransformer;
 use ParallelTask\Task\TaskScheduler;
 
 final class Executor
@@ -38,5 +40,17 @@ final class Executor
         $futureResult = new FutureResult($futureTaskResult);
 
         return $futureResult;
+    }
+
+    /**
+     * @param Queue $queue
+     * @return Executor
+     */
+    public static function usingQueue(Queue $queue)
+    {
+        $taskMessageTransformer = new TaskMessageTransformer();
+        $taskScheduler = new TaskScheduler($queue, $taskMessageTransformer);
+
+        return new Executor($taskScheduler);
     }
 }
