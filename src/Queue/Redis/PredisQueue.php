@@ -3,9 +3,9 @@ namespace ParallelTask\Queue\Redis;
 
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
+use ParallelTask\Queue\InputMessageWithIdentifier;
 use ParallelTask\Queue\NonCallbackQueue;
 use ParallelTask\Queue\OutputMessage;
-use ParallelTask\Queue\InputMessageWithIdentifier;
 use Predis\Client;
 use Predis\ClientContextInterface;
 use Ramsey\Uuid\Uuid;
@@ -114,7 +114,6 @@ class PredisQueue extends NonCallbackQueue
                 $redis->lpush($this->getMessageResultReadyKey($type, $messageId), 'true');
             }
         });
-
     }
 
     /**

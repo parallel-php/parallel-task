@@ -44,7 +44,7 @@ final class TaskScheduler
         $inputMessage = $this->taskInputMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
         $identifier = $this->queue->submitInput($type, $inputMessage);
 
-        $taskResultCallback = function () use($type, $identifier) {
+        $taskResultCallback = function () use ($type, $identifier) {
             return $this->getTaskResult($type, $identifier);
         };
 

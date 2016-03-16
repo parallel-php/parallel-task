@@ -1,9 +1,7 @@
 <?php
 namespace ParallelTask;
 
-use ParallelTask\Queue\Queue;
 use ParallelTask\Task\TaskInput;
-use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskScheduler;
 
 final class Executor

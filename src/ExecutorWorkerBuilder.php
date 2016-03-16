@@ -78,7 +78,7 @@ class ExecutorWorkerBuilder
 
         return new Executor($taskScheduler);
     }
-    
+
     /**
      * @return Worker
      */

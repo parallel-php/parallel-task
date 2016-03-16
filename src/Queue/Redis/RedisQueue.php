@@ -3,9 +3,9 @@ namespace ParallelTask\Queue\Redis;
 
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
+use ParallelTask\Queue\InputMessageWithIdentifier;
 use ParallelTask\Queue\NonCallbackQueue;
 use ParallelTask\Queue\OutputMessage;
-use ParallelTask\Queue\InputMessageWithIdentifier;
 use Ramsey\Uuid\Uuid;
 
 class RedisQueue extends NonCallbackQueue
@@ -24,7 +24,6 @@ class RedisQueue extends NonCallbackQueue
     {
         $this->redis = $redis;
     }
-
 
     /**
      * @param $type
@@ -113,7 +112,6 @@ class RedisQueue extends NonCallbackQueue
             $this->redis->lPush($this->getMessageResultReadyKey($type, $messageId), 'true');
         }
         $this->redis->exec();
-
     }
 
     /**
