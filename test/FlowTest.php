@@ -32,8 +32,8 @@ class FlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageTransformer();
 
-        $taskScheduler = new TaskScheduler($queue, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer);
+        $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $messageTransformer);
 
         $executor = new \ParallelTask\Executor($taskScheduler);
 
