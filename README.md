@@ -43,3 +43,5 @@ Technically, the library is splitted into three parts:
   - `runOnce` runs only one task asynchronously
 
 - Executor/Worker facade. It is just a wrapper around Task module to allow easier composition and usage.
+
+ There is a builder that helps creating `Executor` or `Worker` allowing to configure different implementation for `TaskInputMessageTransformer`, `TaskFactory`, `TaskResultMessageTransformer`.
