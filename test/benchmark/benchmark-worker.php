@@ -1,6 +1,7 @@
 <?php
 
 use ParallelTask\Benchmark\QueueFactory;
+use ParallelTask\Task\SimpleTaskFactory;
 use ParallelTask\Task\TaskMessageTransformer;
 use ParallelTask\Task\TaskRunner;
 use ParallelTask\Worker;
@@ -14,6 +15,7 @@ $queueFactory = new QueueFactory();
 
 $queue = $queueFactory->make($queueType);
 $transformer = new TaskMessageTransformer();
-$worker = new Worker(new TaskRunner($queue, $transformer, $transformer));
+$taskFactory = new SimpleTaskFactory();
+$worker = new Worker(new TaskRunner($queue, $transformer, $taskFactory, $transformer));
 
 $worker->work($type);

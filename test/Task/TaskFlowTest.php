@@ -1,6 +1,7 @@
 <?php
 use ParallelTask\Fixture\LocalArrayTestQueue;
 use ParallelTask\Fixture\TestTask;
+use ParallelTask\Task\SimpleTaskFactory;
 use ParallelTask\Task\TaskInput;
 use ParallelTask\Task\TaskMessageTransformer;
 use ParallelTask\Task\TaskRunner;
@@ -12,9 +13,10 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
     {
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageTransformer();
+        $taskFactory = new SimpleTaskFactory();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
 
         $input = [5, 6];
         $taskInput = new TaskInput($input);
@@ -30,9 +32,10 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
     {
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageTransformer();
+        $taskFactory = new SimpleTaskFactory();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
 
         $input = [];
         $taskInput = new TaskInput($input);
