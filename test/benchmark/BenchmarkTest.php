@@ -3,7 +3,7 @@ namespace ParallelTask\Benchmark;
 
 use ParallelTask\Executor;
 use ParallelTask\FutureResult;
-use ParallelTask\Task\TaskMessageTransformer;
+use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskScheduler;
 use Symfony\Component\Process\Process;
 use TimeBenchmark\Stopwatch;
@@ -28,7 +28,7 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
         foreach ($queueTypes as $queueType) {
             $queue = $queueFactory->make($queueType);
 
-            $transformer = new TaskMessageTransformer();
+            $transformer = new TaskMessageSerializeTransformer();
             $executor = new Executor(new TaskScheduler($queue, $transformer, $transformer));
 
             /** @var Process[] $threads */

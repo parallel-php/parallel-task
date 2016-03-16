@@ -2,8 +2,8 @@
 
 use ParallelTask\Fixture\LocalArrayTestQueue;
 use ParallelTask\Fixture\TestTask;
-use ParallelTask\Task\SimpleTaskFactory;
-use ParallelTask\Task\TaskMessageTransformer;
+use ParallelTask\Task\TaskFactorySimple;
+use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskRunner;
 use ParallelTask\Task\TaskScheduler;
 
@@ -12,8 +12,8 @@ class FlowTest extends \PHPUnit_Framework_TestCase
     public function testFlowSuccess()
     {
         $queue = new LocalArrayTestQueue();
-        $messageTransformer = new TaskMessageTransformer();
-        $taskFactory = new SimpleTaskFactory();
+        $messageTransformer = new TaskMessageSerializeTransformer();
+        $taskFactory = new TaskFactorySimple();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
         $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
@@ -32,8 +32,8 @@ class FlowTest extends \PHPUnit_Framework_TestCase
     public function testFlowException()
     {
         $queue = new LocalArrayTestQueue();
-        $messageTransformer = new TaskMessageTransformer();
-        $taskFactory = new SimpleTaskFactory();
+        $messageTransformer = new TaskMessageSerializeTransformer();
+        $taskFactory = new TaskFactorySimple();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
         $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);

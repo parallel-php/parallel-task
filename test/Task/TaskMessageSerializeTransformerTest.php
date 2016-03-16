@@ -3,12 +3,12 @@ namespace ParallelTask\Task;
 
 use ParallelTask\Fixture\TestException;
 
-class TaskMessageTransformerTest extends \PHPUnit_Framework_TestCase
+class TaskMessageSerializeTransformerTest extends \PHPUnit_Framework_TestCase
 {
     public function testExceptionSerialization()
     {
 
-        $sut = new TaskMessageTransformer();
+        $sut = new TaskMessageSerializeTransformer();
 
         $message = 'test message';
         $code = 123;

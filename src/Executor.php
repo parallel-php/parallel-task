@@ -3,7 +3,7 @@ namespace ParallelTask;
 
 use ParallelTask\Queue\Queue;
 use ParallelTask\Task\TaskInput;
-use ParallelTask\Task\TaskMessageTransformer;
+use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskScheduler;
 
 final class Executor
@@ -48,7 +48,7 @@ final class Executor
      */
     public static function usingQueue(Queue $queue)
     {
-        $taskMessageTransformer = new TaskMessageTransformer();
+        $taskMessageTransformer = new TaskMessageSerializeTransformer();
         $taskScheduler = new TaskScheduler($queue, $taskMessageTransformer, $taskMessageTransformer);
 
         return new Executor($taskScheduler);

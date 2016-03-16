@@ -2,8 +2,8 @@
 namespace ParallelTask;
 
 use ParallelTask\Queue\Queue;
-use ParallelTask\Task\SimpleTaskFactory;
-use ParallelTask\Task\TaskMessageTransformer;
+use ParallelTask\Task\TaskFactorySimple;
+use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskRunner;
 
 final class Worker
@@ -31,8 +31,8 @@ final class Worker
      */
     public static function usingQueue(Queue $queue)
     {
-        $taskMessageTransformer = new TaskMessageTransformer();
-        $taskFactory = new SimpleTaskFactory();
+        $taskMessageTransformer = new TaskMessageSerializeTransformer();
+        $taskFactory = new TaskFactorySimple();
         $taskRunner = new TaskRunner($queue, $taskMessageTransformer, $taskFactory, $taskMessageTransformer);
 
         return new Worker($taskRunner);
