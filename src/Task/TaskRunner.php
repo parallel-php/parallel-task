@@ -12,16 +12,16 @@ final class TaskRunner
     /** @var \Closure */
     private $taskRunCallback;
 
-    public function __construct(Queue $queue, TaskMessageTransformer $taskMessageTransformer)
+    public function __construct(Queue $queue, TaskInputMessageTransformer $taskInputMessageTransformer, TaskResultMessageTransformer $taskResultMessageTransformer)
     {
         $this->queue = $queue;
 
-        $this->taskRunCallback = function (InputMessage $inputMessage) use ($taskMessageTransformer) {
-            $taskClass = $taskMessageTransformer->getTaskClassFromMessage($inputMessage);
+        $this->taskRunCallback = function (InputMessage $inputMessage) use ($taskInputMessageTransformer, $taskResultMessageTransformer) {
+            $taskClass = $taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
             $task = $this->createTask($taskClass);
-            $taskInput = $taskMessageTransformer->getTaskInputFromMessage($inputMessage);
+            $taskInput = $taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
             $taskResult = $this->runTask($task, $taskInput);
-            return $taskMessageTransformer->getOutputMessageFromResult($taskResult);
+            return $taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
         };
     }
 

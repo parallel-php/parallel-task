@@ -13,8 +13,8 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageTransformer();
 
-        $taskScheduler = new TaskScheduler($queue, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer);
+        $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $messageTransformer);
 
         $input = [5, 6];
         $taskInput = new TaskInput($input);
@@ -31,8 +31,8 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageTransformer();
 
-        $taskScheduler = new TaskScheduler($queue, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer);
+        $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $messageTransformer);
 
         $input = [];
         $taskInput = new TaskInput($input);

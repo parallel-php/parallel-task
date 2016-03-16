@@ -49,7 +49,7 @@ final class Executor
     public static function usingQueue(Queue $queue)
     {
         $taskMessageTransformer = new TaskMessageTransformer();
-        $taskScheduler = new TaskScheduler($queue, $taskMessageTransformer);
+        $taskScheduler = new TaskScheduler($queue, $taskMessageTransformer, $taskMessageTransformer);
 
         return new Executor($taskScheduler);
     }

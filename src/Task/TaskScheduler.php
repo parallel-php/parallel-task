@@ -9,13 +9,17 @@ final class TaskScheduler
     /** @var Queue */
     private $queue;
 
-    /** @var TaskMessageTransformer */
-    private $taskMessageTransformer;
+    /** @var TaskInputMessageTransformer */
+    private $taskInputMessageTransformer;
 
-    public function __construct(Queue $queue, TaskMessageTransformer $taskMessageTransformer)
+    /** @var TaskResultMessageTransformer */
+    private $taskResultMessageTransformer;
+
+    public function __construct(Queue $queue, TaskInputMessageTransformer $taskInputMessageTransformer, TaskResultMessageTransformer $taskResultMessageTransformer)
     {
         $this->queue = $queue;
-        $this->taskMessageTransformer = $taskMessageTransformer;
+        $this->taskInputMessageTransformer = $taskInputMessageTransformer;
+        $this->taskResultMessageTransformer = $taskResultMessageTransformer;
     }
 
     /**
@@ -25,7 +29,7 @@ final class TaskScheduler
      */
     public function execute($type, $taskClass, TaskInput $taskInput)
     {
-        $inputMessage = $this->taskMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
+        $inputMessage = $this->taskInputMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
         $this->queue->putInput($type, $inputMessage);
     }
 
@@ -37,7 +41,7 @@ final class TaskScheduler
      */
     public function submit($type, $taskClass, TaskInput $taskInput)
     {
-        $inputMessage = $this->taskMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
+        $inputMessage = $this->taskInputMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
         $identifier = $this->queue->submitInput($type, $inputMessage);
 
         $taskResultCallback = function () use($type, $identifier) {
@@ -55,7 +59,7 @@ final class TaskScheduler
     private function getTaskResult($type, InputMessageIdentifier $identifier)
     {
         $outputMessage = $this->queue->getOutput($type, $identifier);
-        $taskResult = $this->taskMessageTransformer->getTaskResultFromMessage($outputMessage);
+        $taskResult = $this->taskResultMessageTransformer->getTaskResultFromMessage($outputMessage);
 
         return $taskResult;
     }

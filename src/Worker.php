@@ -31,7 +31,7 @@ final class Worker
     public static function usingQueue(Queue $queue)
     {
         $taskMessageTransformer = new TaskMessageTransformer();
-        $taskRunner = new TaskRunner($queue, $taskMessageTransformer);
+        $taskRunner = new TaskRunner($queue, $taskMessageTransformer, $taskMessageTransformer);
 
         return new Worker($taskRunner);
     }

@@ -29,7 +29,7 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
             $queue = $queueFactory->make($queueType);
 
             $transformer = new TaskMessageTransformer();
-            $executor = new Executor(new TaskScheduler($queue, $transformer));
+            $executor = new Executor(new TaskScheduler($queue, $transformer, $transformer));
 
             /** @var Process[] $threads */
             $threads = [];

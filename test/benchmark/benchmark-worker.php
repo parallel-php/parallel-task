@@ -14,6 +14,6 @@ $queueFactory = new QueueFactory();
 
 $queue = $queueFactory->make($queueType);
 $transformer = new TaskMessageTransformer();
-$worker = new Worker(new TaskRunner($queue, $transformer));
+$worker = new Worker(new TaskRunner($queue, $transformer, $transformer));
 
 $worker->work($type);
