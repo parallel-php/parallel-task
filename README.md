@@ -8,12 +8,14 @@ How to use it:
 - Choose a queue implementation and create an instance of it. Existing implementations: Redis and RabbitMQ. Help with more implementations is appreciated.
 - Build the worker using queue and start it in a cli environment. You can start multiple workers.
 ```php
-$worker = Worker::usingQueue($queue);
+$workerBuilder = new ExecutorWorkerBuilder()
+$worker = $workerBuilder->withQueue($queue)->buildWorker();
 $worker->work($type);
 ```
 - Build the executor using queue
 ```php
-$executor = Executor::usingQueue($queue);
+$executorBuilder = new ExecutorWorkerBuilder()
+$executor = $executorBuilder->withQueue($queue)->buildExecutor();
 ```
 - Define a task by implementing the `Task` interface.
 - Submit task and get results

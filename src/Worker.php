@@ -24,17 +24,4 @@ final class Worker
     {
         $this->taskRunner->run($type);
     }
-
-    /**
-     * @param Queue $queue
-     * @return Worker
-     */
-    public static function usingQueue(Queue $queue)
-    {
-        $taskMessageTransformer = new TaskMessageSerializeTransformer();
-        $taskFactory = new TaskFactorySimple();
-        $taskRunner = new TaskRunner($queue, $taskMessageTransformer, $taskFactory, $taskMessageTransformer);
-
-        return new Worker($taskRunner);
-    }
 }

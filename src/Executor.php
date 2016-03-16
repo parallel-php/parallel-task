@@ -41,16 +41,4 @@ final class Executor
 
         return $futureResult;
     }
-
-    /**
-     * @param Queue $queue
-     * @return Executor
-     */
-    public static function usingQueue(Queue $queue)
-    {
-        $taskMessageTransformer = new TaskMessageSerializeTransformer();
-        $taskScheduler = new TaskScheduler($queue, $taskMessageTransformer, $taskMessageTransformer);
-
-        return new Executor($taskScheduler);
-    }
 }
