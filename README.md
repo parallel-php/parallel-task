@@ -40,4 +40,4 @@ Technically, the library is splitted into three parts:
   * `run` runs tasks asynchronously in a loop
   - `runOnce` runs only one task asynchronously
 
-- Executor/Worker facade.
+- Executor/Worker facade. It is just a wrapper around Task module to allow easier composition and usage.
