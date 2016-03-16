@@ -4,13 +4,8 @@ namespace ParallelTask\Task;
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\OutputMessage;
 
-class TaskMessageTransformer
+class TaskMessageTransformer implements TaskInputMessageTransformer, TaskResultMessageTransformer
 {
-    /**
-     * @param string $taskClass
-     * @param TaskInput $taskInput
-     * @return InputMessage
-     */
     public function getInputMessageFromTaskInput($taskClass, TaskInput $taskInput)
     {
         $taskClassLength = strlen($taskClass);
@@ -28,10 +23,6 @@ class TaskMessageTransformer
         return new InputMessage($data);
     }
 
-    /**
-     * @param InputMessage $message
-     * @return string
-     */
     public function getTaskClassFromMessage(InputMessage $message)
     {
         $data = $message->getData();
@@ -44,10 +35,6 @@ class TaskMessageTransformer
         return $taskClass;
     }
 
-    /**
-     * @param InputMessage $message
-     * @return TaskInput
-     */
     public function getTaskInputFromMessage(InputMessage $message)
     {
         $data = $message->getData();
@@ -61,10 +48,6 @@ class TaskMessageTransformer
         return new TaskInput($parameters);
     }
 
-    /**
-     * @param TaskResult $taskResult
-     * @return OutputMessage
-     */
     public function getOutputMessageFromResult(TaskResult $taskResult)
     {
         try {
@@ -87,10 +70,6 @@ class TaskMessageTransformer
         return new OutputMessage($data);
     }
 
-    /**
-     * @param OutputMessage $message
-     * @return TaskResult
-     */
     public function getTaskResultFromMessage(OutputMessage $message)
     {
         $data = $message->getData();
