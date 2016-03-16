@@ -44,4 +44,4 @@ Technically, the library is splitted into three parts:
 
 - Executor/Worker facade. It is just a wrapper around Task module to allow easier composition and usage.
 
- There is a builder that helps creating `Executor` or `Worker` allowing to configure different implementation for `TaskInputMessageTransformer`, `TaskFactory`, `TaskResultMessageTransformer`.
+ There is a builder that helps creating `Executor` or `Worker` allowing to configure implementation for `Queue` and to change default implemention of `TaskInputMessageTransformer`, `TaskFactory`, `TaskResultMessageTransformer`.
