@@ -31,9 +31,11 @@ Technically, the library is splitted into three parts:
   - `getOutput` receives an `InputMessageIdentifier` and returns the `OutputMessage` result for it. It's blocking until the result is available.
 
 - Task module. Uses Queue module adding a layer of `Task` implementation. From the outside, it has two classes with two interfaces: `TaskScheduler` and `TaskRunner` each of them used for scheduling a task for asynchronous run and respectively running tasks asynchronously.
+
  The interfaces of `TaskScheduler` is:
   * `execute` receives a new Task and the inputs for it. It should be used for methods that don't have a return type.
   - `submit` receives a new Task and the inputs for it and returns a `FutureTaskResult`. Should be used for methods that returns something.
+
  The interfaces of `TaskRunner` is:
   * `run` runs tasks asynchronously in a loop
   - `runOnce` runs only one task asynchronously
