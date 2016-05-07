@@ -8,6 +8,8 @@ use ParallelTask\Task\TaskInputMessageTransformer;
 use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskResultMessageTransformer;
 use ParallelTask\Task\TaskRunner;
+use ParallelTask\Task\TaskRunnerNullSupervisor;
+use ParallelTask\Task\TaskRunnerSupervisor;
 use ParallelTask\Task\TaskScheduler;
 
 class ExecutorWorkerBuilder
@@ -20,11 +22,14 @@ class ExecutorWorkerBuilder
     private $taskResultMessageTransformer;
     /** @var TaskFactory */
     private $taskFactory;
+    /** @var TaskRunnerSupervisor */
+    private $taskRunnerSupervisor;
 
     public function __construct()
     {
         $this->taskInputMessageTransformer = $this->taskResultMessageTransformer = new TaskMessageSerializeTransformer();
         $this->taskFactory = new TaskFactorySimple();
+        $this->taskRunnerSupervisor = new TaskRunnerNullSupervisor();
     }
 
     /**
@@ -68,6 +73,16 @@ class ExecutorWorkerBuilder
     }
 
     /**
+     * @param TaskRunnerSupervisor $taskRunnerSupervisor
+     * @return ExecutorWorkerBuilder
+     */
+    public function withTaskRunnerSupervisor(TaskRunnerSupervisor $taskRunnerSupervisor)
+    {
+        $this->taskRunnerSupervisor = $taskRunnerSupervisor;
+        return $this;
+    }
+
+    /**
      * @return Executor
      */
     public function buildExecutor()
@@ -86,7 +101,7 @@ class ExecutorWorkerBuilder
     {
         $this->checkRequiredParameters();
 
-        $taskRunner = new TaskRunner($this->queue, $this->taskInputMessageTransformer, $this->taskFactory, $this->taskResultMessageTransformer);
+        $taskRunner = new TaskRunner($this->queue, $this->taskInputMessageTransformer, $this->taskFactory, $this->taskResultMessageTransformer, $this->taskRunnerSupervisor);
 
         return new Worker($taskRunner);
     }
