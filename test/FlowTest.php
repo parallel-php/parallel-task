@@ -5,6 +5,7 @@ use ParallelTask\Fixture\TestTask;
 use ParallelTask\Task\TaskFactorySimple;
 use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskRunner;
+use ParallelTask\Task\TaskRunnerNullSupervisor;
 use ParallelTask\Task\TaskScheduler;
 
 class FlowTest extends \PHPUnit_Framework_TestCase
@@ -14,9 +15,10 @@ class FlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageSerializeTransformer();
         $taskFactory = new TaskFactorySimple();
+        $taskRunnerSupervisor = new TaskRunnerNullSupervisor();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer, $taskRunnerSupervisor);
 
         $executor = new \ParallelTask\Executor($taskScheduler);
 
@@ -34,9 +36,10 @@ class FlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageSerializeTransformer();
         $taskFactory = new TaskFactorySimple();
+        $taskRunnerSupervisor = new TaskRunnerNullSupervisor();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer, $taskRunnerSupervisor);
 
         $executor = new \ParallelTask\Executor($taskScheduler);
 
