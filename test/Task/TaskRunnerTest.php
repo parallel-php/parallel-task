@@ -41,8 +41,27 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
 
     public function testRunOnce() {
         $type = 'testType';
-        $this->createPropheciesForTaskRunnerRun($type);
+        $queueRunMethodProphecy = $this->createPropheciesForTaskRunnerRun($type);
+        $queueRunMethodProphecy->shouldBeCalledTimes(1);
         $this->sut->runOnce($type);
+    }
+
+    public function testRun() {
+        $type = 'testType';
+        $this->taskRunnerSupervisorProphecy->startSupervisingRunner()->willReturn(null);
+        $this->taskRunnerSupervisorProphecy->shouldRunnerStop()->will(function (){
+            $this->shouldRunnerStop()->will(function (){
+                $this->shouldRunnerStop()->will(function (){
+                    $this->shouldRunnerStop()->willReturn(true);
+                    return false;
+                });
+                return false;
+            });
+            return false;
+        });
+        $queueRunMethodProphecy = $this->createPropheciesForTaskRunnerRun($type);
+        $queueRunMethodProphecy->shouldBeCalledTimes(4);
+        $this->sut->run($type);
     }
 
     /**
@@ -88,8 +107,6 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
             $prophet->assertEquals($outputMessage, $outputMessageResult);
         });
 
-        $queueRunMethodProphecy->shouldBeCalledTimes(1);
+        return $queueRunMethodProphecy;
     }
-
-
 }
