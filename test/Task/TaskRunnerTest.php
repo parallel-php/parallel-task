@@ -40,35 +40,38 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testRunOnce() {
-        //given
         $type = 'testType';
+        $prophet = $this;
 
-        $inputMessage = new InputMessage('input');
-        $outputMessage = new OutputMessage('output');
+        $this->queueProphecy->run($type, Argument::type('callable'))->will(function($parameters) use ($prophet) {
+            $inputMessage = new InputMessage('input');
+            $taskClass = 'Task';
+            $taskInput = new TaskInput([]);
 
-        $taskClass = 'Task';
-        $taskProphecy = $this->prophesize(Task::class);
-        $taskInput = new TaskInput([]);
-        $result = 'x';
-        $taskResult = TaskResult::fromReturn($result);
+            $prophet->taskInputMessageTransformerProphecy->getTaskClassFromMessage($inputMessage)->willReturn($taskClass);
+            $prophet->taskInputMessageTransformerProphecy->getTaskInputFromMessage($inputMessage)->willReturn($taskInput);
 
-        $this->taskInputMessageTransformerProphecy->getTaskClassFromMessage($inputMessage)->willReturn($taskClass);
-        $this->taskFactoryProphecy->createTask($taskClass)->willReturn($taskProphecy->reveal());
-        $this->taskInputMessageTransformerProphecy->getTaskInputFromMessage($inputMessage)->willReturn($taskInput);
-        $taskRunMethodProphecy = $taskProphecy->run($taskInput)->willReturn($result);
-        $this->taskResultMessageTransformerProphecy->getOutputMessageFromResult($taskResult)->willReturn($outputMessage);
+            $prophet->taskFactoryProphecy->createTask($taskClass)->will(function() use ($taskInput, &$outputMessage, $prophet) {
+                $taskProphecy = $prophet->prophesize(Task::class);
 
-        $this->queueProphecy->run($type, Argument::type('callable'))->will(function($parameters) use ($inputMessage, &$outputMessageResult) {
+                $taskRunMethodProphecy = $taskProphecy->run($taskInput)->will(function() use (&$outputMessage, $prophet) {
+                    $result = 'x';
+                    $outputMessage = new OutputMessage('output');
+                    $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult(TaskResult::fromReturn($result))->willReturn($outputMessage);
+                    return $result;
+                });
+
+                $taskRunMethodProphecy->shouldBeCalledTimes(1);
+                return $taskProphecy->reveal();
+            });
+
+
             $callable = $parameters[1];
             $outputMessageResult = $callable($inputMessage);
+            $prophet->assertEquals($outputMessage, $outputMessageResult);
         });
 
-        //when
         $this->sut->runOnce($type);
-
-        //then
-        $taskRunMethodProphecy->shouldHaveBeenCalledTimes(1);
-        $this->assertEquals($outputMessage, $outputMessageResult);
     }
 
 
