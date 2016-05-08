@@ -12,23 +12,45 @@ final class TaskRunner
     /** @var \Closure */
     private $taskRunCallback;
 
-    public function __construct(Queue $queue, TaskInputMessageTransformer $taskInputMessageTransformer, TaskFactory $taskFactory, TaskResultMessageTransformer $taskResultMessageTransformer)
-    {
+    /** @var TaskRunnerSupervisor */
+    private $runnerSupervisor;
+
+    public function __construct(
+        Queue $queue,
+        TaskInputMessageTransformer $taskInputMessageTransformer,
+        TaskFactory $taskFactory,
+        TaskResultMessageTransformer $taskResultMessageTransformer,
+        TaskRunnerSupervisor $runnerSupervisor
+    ) {
         $this->queue = $queue;
 
-        $this->taskRunCallback = function (InputMessage $inputMessage) use ($taskInputMessageTransformer, $taskFactory, $taskResultMessageTransformer) {
+        $this->taskRunCallback = function (
+            InputMessage $inputMessage
+        ) use (
+            $taskInputMessageTransformer,
+            $taskFactory,
+            $taskResultMessageTransformer
+        ) {
             $taskClass = $taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
             $task = $taskFactory->createTask($taskClass);
             $taskInput = $taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
             $taskResult = $this->runTask($task, $taskInput);
             return $taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
         };
+
+        $this->runnerSupervisor = $runnerSupervisor;
     }
 
     public function run($type)
     {
+        $this->runnerSupervisor->startSupervisingRunner();
+
         while (true) {
             $this->queue->run($type, $this->taskRunCallback);
+            
+            if ($this->runnerSupervisor->shouldRunnerStop()) {
+                break;
+            }
         }
     }
 

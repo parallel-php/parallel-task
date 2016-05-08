@@ -5,6 +5,7 @@ use ParallelTask\Task\TaskFactorySimple;
 use ParallelTask\Task\TaskInput;
 use ParallelTask\Task\TaskMessageSerializeTransformer;
 use ParallelTask\Task\TaskRunner;
+use ParallelTask\Task\TaskRunnerNullSupervisor;
 use ParallelTask\Task\TaskScheduler;
 
 class TaskFlowTest extends \PHPUnit_Framework_TestCase
@@ -14,9 +15,10 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageSerializeTransformer();
         $taskFactory = new TaskFactorySimple();
+        $taskRunnerSupervisor = new TaskRunnerNullSupervisor();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer, $taskRunnerSupervisor);
 
         $input = [5, 6];
         $taskInput = new TaskInput($input);
@@ -33,9 +35,10 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
         $queue = new LocalArrayTestQueue();
         $messageTransformer = new TaskMessageSerializeTransformer();
         $taskFactory = new TaskFactorySimple();
+        $taskRunnerSupervisor = new TaskRunnerNullSupervisor();
 
         $taskScheduler = new TaskScheduler($queue, $messageTransformer, $messageTransformer);
-        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer);
+        $taskRunner = new TaskRunner($queue, $messageTransformer, $taskFactory, $messageTransformer, $taskRunnerSupervisor);
 
         $input = [];
         $taskInput = new TaskInput($input);
