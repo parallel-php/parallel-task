@@ -41,22 +41,40 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
 
     public function testRunOnce() {
         $type = 'testType';
+        $this->createPropheciesForTaskRunnerRun($type);
+        $this->sut->runOnce($type);
+    }
+
+    /**
+     * @param $type
+     */
+    private function createPropheciesForTaskRunnerRun($type)
+    {
         $prophet = $this;
 
-        $this->queueProphecy->run($type, Argument::type('callable'))->will(function($parameters) use ($prophet) {
-            $inputMessage = new InputMessage('input');
-            $taskClass = 'Task';
-            $taskInput = new TaskInput([]);
+        $queueRunMethodProphecy = $this->queueProphecy->run($type, Argument::type('callable'))->will(function (
+            $parameters
+        ) use ($prophet) {
+            $inputMessage = new InputMessage('input' . mt_rand(0, 65535));
+            $taskClass = 'Task' . mt_rand(0, 65535);
+            $taskInput = new TaskInput([mt_rand(0, 65535)]);
 
             $prophet->taskInputMessageTransformerProphecy->getTaskClassFromMessage($inputMessage)->willReturn($taskClass);
             $prophet->taskInputMessageTransformerProphecy->getTaskInputFromMessage($inputMessage)->willReturn($taskInput);
 
-            $prophet->taskFactoryProphecy->createTask($taskClass)->will(function() use ($taskInput, &$outputMessage, $prophet) {
+            $prophet->taskFactoryProphecy->createTask($taskClass)->will(function () use (
+                $taskInput,
+                &$outputMessage,
+                $prophet
+            ) {
                 $taskProphecy = $prophet->prophesize(Task::class);
 
-                $taskRunMethodProphecy = $taskProphecy->run($taskInput)->will(function() use (&$outputMessage, $prophet) {
-                    $result = 'x';
-                    $outputMessage = new OutputMessage('output');
+                $taskRunMethodProphecy = $taskProphecy->run($taskInput)->will(function () use (
+                    &$outputMessage,
+                    $prophet
+                ) {
+                    $result = mt_rand(0, 65535);
+                    $outputMessage = new OutputMessage('output' . mt_rand(0, 65535));
                     $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult(TaskResult::fromReturn($result))->willReturn($outputMessage);
                     return $result;
                 });
@@ -65,16 +83,13 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
                 return $taskProphecy->reveal();
             });
 
-
             $callable = $parameters[1];
             $outputMessageResult = $callable($inputMessage);
             $prophet->assertEquals($outputMessage, $outputMessageResult);
         });
 
-        $this->sut->runOnce($type);
+        $queueRunMethodProphecy->shouldBeCalledTimes(1);
     }
-
-
 
 
 }
