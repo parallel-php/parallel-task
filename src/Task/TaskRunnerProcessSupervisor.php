@@ -1,7 +1,7 @@
 <?php
 namespace ParallelTask\Task;
 
-class TaskRunnerProcessSupervisor implements TaskRunnerSupervisor
+final class TaskRunnerProcessSupervisor implements TaskRunnerSupervisor
 {
     /** @var int maximum run time in seconds */
     private $maxRunTime;

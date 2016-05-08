@@ -1,7 +1,7 @@
 <?php
 namespace ParallelTask\Task;
 
-class TaskRunnerNullSupervisor implements TaskRunnerSupervisor
+final class TaskRunnerNullSupervisor implements TaskRunnerSupervisor
 {
     public function startSupervisingRunner()
     {
