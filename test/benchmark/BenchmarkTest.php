@@ -19,7 +19,7 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
         ];
 
         $queueFactory = new QueueFactory();
-        $messageCount = 1000;
+        $messageCount = 200;
         $threadCount = 4;
         $type = 'benchmark-sum';
         $workerScript = __DIR__ . '/benchmark-worker.php';
@@ -38,7 +38,7 @@ class BenchmarkTest extends \PHPUnit_Framework_TestCase
                 $thread->start();
                 $threads[] = $thread;
             }
-            sleep(2);
+            sleep(1);
 
             $stopwatch = Stopwatch::createStarted();
 

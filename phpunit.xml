@@ -12,6 +12,9 @@
             <directory>test</directory>
             <exclude>test/benchmark</exclude>
         </testsuite>
+        <testsuite name="Parallel Task Benchmark Suite">
+            <directory>test/benchmark</directory>
+        </testsuite>
     </testsuites>
 
     <filter>
