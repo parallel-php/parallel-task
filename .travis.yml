@@ -17,4 +17,5 @@ services:
   - rabbitmq
 before_script:
   - phpenv config-add travis-config.ini
+  - composer self-update --stable
   - composer install
