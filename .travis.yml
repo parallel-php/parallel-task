@@ -21,3 +21,4 @@ before_script:
   - composer install
 script:
   - vendor/bin/phpunit --testdox --testsuite "Parallel Task Test Suite"
+  - vendor/bin/phpunit --testdox --testsuite "Parallel Task Benchmark Suite"
