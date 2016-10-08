@@ -13,17 +13,19 @@
     "require": {
         "php": ">=5.5.0",
         "doctrine/instantiator": "~1.0.5",
-        "ramsey/uuid": "~3.5.1",
-        "php-amqplib/php-amqplib": "~2.6.3",
-        "predis/predis": "~1.1.1"
+        "ramsey/uuid": "~3.5.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8 || ^5.6",
+        "php-amqplib/php-amqplib": "~2.6.3",
+        "predis/predis": "~1.1.1",
         "drealecs/time-benchmark": "~1.0.0",
         "symfony/process": "~3.1.5"
     },
     "suggest": {
-      "ext-redis": "*"
+      "php-amqplib/php-amqplib": "Provides rabbitmq PHP implementation",
+      "predis/predis": "Provides redis PHP implementation",
+      "ext-redis": "Provides redis extension implementation"
     },
     "autoload": {
         "psr-4": {
