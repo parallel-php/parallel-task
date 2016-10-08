@@ -19,3 +19,5 @@ before_script:
   - phpenv config-add travis-config.ini
   - composer self-update --stable
   - composer install
+script:
+  - vendor/bin/phpunit --testdox --testsuite "Parallel Task Test Suite"
