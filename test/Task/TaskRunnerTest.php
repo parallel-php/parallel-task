@@ -48,7 +48,7 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
 
     public function testRun() {
         $type = 'testType';
-        $this->taskRunnerSupervisorProphecy->startSupervisingRunner()->willReturn(null);
+        $this->taskRunnerSupervisorProphecy->markRunnerStart();
         $this->taskRunnerSupervisorProphecy->shouldRunnerStop()->will(function (){
             $this->shouldRunnerStop()->will(function (){
                 $this->shouldRunnerStop()->will(function (){
