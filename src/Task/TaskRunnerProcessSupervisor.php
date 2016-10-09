@@ -23,7 +23,7 @@ final class TaskRunnerProcessSupervisor implements TaskRunnerSupervisor
         $this->maxMemoryIncrease = $maxMemoryIncrease;
     }
 
-    public function startSupervisingRunner()
+    public function markRunnerStart()
     {
         $this->startTime = time();
         $this->startMemoryUsage = memory_get_usage();

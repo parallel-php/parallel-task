@@ -43,7 +43,7 @@ final class TaskRunner
 
     public function run($type)
     {
-        $this->runnerSupervisor->startSupervisingRunner();
+        $this->runnerSupervisor->markRunnerStart();
 
         while (true) {
             $this->queue->run($type, $this->taskRunCallback);
