@@ -14,6 +14,18 @@ final class TaskRunner
 
     /** @var TaskRunnerSupervisor */
     private $runnerSupervisor;
+    /**
+     * @var TaskInputMessageTransformer
+     */
+    private $taskInputMessageTransformer;
+    /**
+     * @var TaskFactory
+     */
+    private $taskFactory;
+    /**
+     * @var TaskResultMessageTransformer
+     */
+    private $taskResultMessageTransformer;
 
     public function __construct(
         Queue $queue,
@@ -23,22 +35,21 @@ final class TaskRunner
         TaskRunnerSupervisor $runnerSupervisor
     ) {
         $this->queue = $queue;
+        $this->runnerSupervisor = $runnerSupervisor;
+        $this->taskInputMessageTransformer = $taskInputMessageTransformer;
+        $this->taskFactory = $taskFactory;
+        $this->taskResultMessageTransformer = $taskResultMessageTransformer;
 
         $this->taskRunCallback = function (
             InputMessage $inputMessage
-        ) use (
-            $taskInputMessageTransformer,
-            $taskFactory,
-            $taskResultMessageTransformer
         ) {
-            $taskClass = $taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
-            $task = $taskFactory->createTask($taskClass);
-            $taskInput = $taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
+            $taskClass = $this->taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
+            $task = $this->taskFactory->createTask($taskClass);
+            $taskInput = $this->taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
             $taskResult = $this->runTask($task, $taskInput);
-            return $taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
+            return $this->taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
         };
 
-        $this->runnerSupervisor = $runnerSupervisor;
     }
 
     public function run($type)
