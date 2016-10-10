@@ -43,11 +43,11 @@ final class TaskRunner
         $this->taskRunCallback = function (
             InputMessage $inputMessage
         ) {
-            $taskClass = $this->taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
-            $task = $this->taskFactory->createTask($taskClass);
-            $taskInput = $this->taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
-            $taskResult = $this->runTask($task, $taskInput);
-            return $this->taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
+            $this->checkInputMessage($inputMessage);
+
+            $outputMessage = $this->processInputMessage($inputMessage);
+
+            return $outputMessage;
         };
 
     }
@@ -58,7 +58,7 @@ final class TaskRunner
 
         while (true) {
             $this->queue->run($type, $this->taskRunCallback);
-            
+
             if ($this->runnerSupervisor->shouldRunnerStop()) {
                 break;
             }
@@ -68,6 +68,26 @@ final class TaskRunner
     public function runOnce($type)
     {
         $this->queue->run($type, $this->taskRunCallback);
+    }
+
+    private function checkInputMessage($inputMessage)
+    {
+    }
+
+    private function processInputMessage($inputMessage)
+    {
+        $task = $this->getTask($inputMessage);
+        $taskInput = $this->taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
+        $taskResult = $this->runTask($task, $taskInput);
+
+        return $this->taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
+    }
+
+    private function getTask($inputMessage)
+    {
+        $taskClass = $this->taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
+
+        return $this->taskFactory->createTask($taskClass);
     }
 
     /**
