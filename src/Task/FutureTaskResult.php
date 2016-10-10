@@ -3,8 +3,11 @@ namespace ParallelTask\Task;
 
 final class FutureTaskResult
 {
+    private $taskResult;
     /** @var \Closure */
     private $taskResultCallback;
+    /** @var bool */
+    private $taskResultCallbackSolved = false;
 
     public function __construct(\Closure $taskResultCallback)
     {
@@ -16,9 +19,12 @@ final class FutureTaskResult
      */
     public function getTaskResult()
     {
-        $taskResultCallback = $this->taskResultCallback;
-        $taskResult = $taskResultCallback();
+        if (!$this->taskResultCallbackSolved) {
+            $taskResultCallback = $this->taskResultCallback;
+            $this->taskResult = $taskResultCallback();
+            $this->taskResultCallbackSolved = true;
+        }
 
-        return $taskResult;
+        return $this->taskResult;
     }
 }
