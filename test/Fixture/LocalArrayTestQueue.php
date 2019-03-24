@@ -1,22 +1,27 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Fixture;
 
+use ParallelTask\Queue\ConsumeQueue;
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
+use ParallelTask\Queue\OutputMessage;
+use ParallelTask\Queue\PublishQueue;
 use ParallelTask\Queue\Queue;
 
-class LocalArrayTestQueue implements Queue
+class LocalArrayTestQueue implements PublishQueue, ConsumeQueue, Queue
 {
     private $storageInput = [];
 
     private $storageOutput = [];
 
-    public function putInput($type, InputMessage $inputMessage)
+    public function putInput(string $type, InputMessage $inputMessage): void
     {
         $this->submitInput($type, $inputMessage);
     }
 
-    public function submitInput($type, InputMessage $inputMessage)
+    public function submitInput(string $type, InputMessage $inputMessage): InputMessageIdentifier
     {
         if (!isset($this->storageInput[$type])) {
             $this->storageInput[$type] = [];
@@ -30,7 +35,7 @@ class LocalArrayTestQueue implements Queue
         return new InputMessageIdentifier($inputMessageKey);
     }
 
-    public function run($type, callable $runCallback)
+    public function run(string $type, callable $runCallback): void
     {
         $inputMessage = reset($this->storageInput[$type]);
         $inputMessageKey = key($this->storageInput[$type]);
@@ -40,7 +45,7 @@ class LocalArrayTestQueue implements Queue
         $this->storageOutput[$inputMessageKey] = $outputMessage;
     }
 
-    public function getOutput($type, InputMessageIdentifier $identifier)
+    public function getOutput(string $type, InputMessageIdentifier $identifier): OutputMessage
     {
         return $this->storageOutput[$identifier->getId()];
     }

@@ -1,19 +1,24 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Queue\RabbitMQ;
 
+use ParallelTask\Queue\ConsumeQueue;
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
 use ParallelTask\Queue\OutputMessage;
+use ParallelTask\Queue\PublishQueue;
 use ParallelTask\Queue\Queue;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Ramsey\Uuid\Uuid;
 
-class RabbitMQQueue implements Queue
+class RabbitMQQueue implements PublishQueue, ConsumeQueue, Queue
 {
     /** @var AMQPStreamConnection */
     private $connection;
-    /** @var \AMQPChannel */
+    /** @var AMQPChannel */
     private $channel;
     /** @var string */
     private $replyQueueName;
@@ -30,7 +35,7 @@ class RabbitMQQueue implements Queue
         $this->channel = $connection->channel();
     }
 
-    public function putInput($type, InputMessage $inputMessage)
+    public function putInput(string $type, InputMessage $inputMessage): void
     {
         $this->declareQueue($type);
 
@@ -38,7 +43,7 @@ class RabbitMQQueue implements Queue
         $this->channel->basic_publish($amqpMessage, $this->getExchangeName($type));
     }
 
-    public function submitInput($type, InputMessage $inputMessage)
+    public function submitInput(string $type, InputMessage $inputMessage): InputMessageIdentifier
     {
         $this->declareQueue($type);
 
@@ -64,7 +69,7 @@ class RabbitMQQueue implements Queue
         return new InputMessageIdentifier($id);
     }
 
-    public function run($type, callable $runCallback)
+    public function run(string $type, callable $runCallback): void
     {
         static $wrapperPassingRunCallback;
         if (!isset($wrapperPassingRunCallback)) {
@@ -99,7 +104,7 @@ class RabbitMQQueue implements Queue
         unset($wrapperPassingRunCallback['runCallback']);
     }
 
-    public function getOutput($type, InputMessageIdentifier $identifier)
+    public function getOutput(string $type, InputMessageIdentifier $identifier): OutputMessage
     {
         $id = $identifier->getId();
 
