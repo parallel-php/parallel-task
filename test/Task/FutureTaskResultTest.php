@@ -2,7 +2,7 @@
 
 namespace ParallelTask\Task;
 
-class FutureTaskResultTest extends \PHPUnit_Framework_TestCase
+class FutureTaskResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testResolvingFutureCallable()
     {

@@ -8,7 +8,7 @@ use ParallelTask\Task\TaskRunner;
 use ParallelTask\Task\TaskRunnerNullSupervisor;
 use ParallelTask\Task\TaskScheduler;
 
-class TaskFlowTest extends \PHPUnit_Framework_TestCase
+class TaskFlowTest extends \PHPUnit\Framework\TestCase
 {
     public function testFlowSuccess()
     {
@@ -45,7 +45,7 @@ class TaskFlowTest extends \PHPUnit_Framework_TestCase
 
         $futureTaskResult = $taskScheduler->submit('testType', TestTask::class, $taskInput);
         $taskRunner->runOnce('testType');
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $futureTaskResult->getTaskResult()->getResult();
     }
 }

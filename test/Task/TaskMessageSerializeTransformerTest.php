@@ -3,7 +3,7 @@ namespace ParallelTask\Task;
 
 use ParallelTask\Fixture\TestException;
 
-class TaskMessageSerializeTransformerTest extends \PHPUnit_Framework_TestCase
+class TaskMessageSerializeTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testExceptionSerialization()
     {

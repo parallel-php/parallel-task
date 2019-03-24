@@ -7,7 +7,7 @@ use ParallelTask\Queue\Queue;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class TaskRunnerTest extends \PHPUnit_Framework_TestCase
+class TaskRunnerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectProphecy */
     private $queueProphecy;

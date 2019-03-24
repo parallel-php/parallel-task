@@ -1,7 +1,7 @@
 <?php
 namespace ParallelTask\Queue;
 
-abstract class QueueTest extends \PHPUnit_Framework_TestCase
+abstract class QueueTest extends \PHPUnit\Framework\TestCase
 {
 
     /** @var Queue */

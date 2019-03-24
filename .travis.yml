@@ -1,23 +1,19 @@
 language: php
 sudo: false
 php:
-  - 5.5
-  - 5.6
-  - 7.0
-  - hhvm
+  - 7.1
+  - 7.2
+  - 7.3
   - nightly
-  - hhvm-nightly
 matrix:
   allow_failures:
-    - php: hhvm
     - php: nightly
-    - php: hhvm-nightly
 services:
   - redis-server
   - rabbitmq
 before_script:
   - phpenv config-add travis-config.ini
   - composer self-update --stable
-  - composer install
+  - composer update
 script:
   - vendor/bin/phpunit --testdox --testsuite "Parallel Task Test Suite"
