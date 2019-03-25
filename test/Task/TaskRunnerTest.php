@@ -78,9 +78,9 @@ class TaskRunnerTest extends \PHPUnit\Framework\TestCase
         $queueRunMethodProphecy = $this->queueProphecy->run($type, Argument::type('callable'))->will(function (
             $parameters
         ) use ($prophet) {
-            $inputMessage = new InputMessage('input' . mt_rand(0, 65535));
-            $taskClass = 'Task' . mt_rand(0, 65535);
-            $taskInput = new TaskInput([mt_rand(0, 65535)]);
+            $inputMessage = new InputMessage('input' . random_int(0, 65535));
+            $taskClass = 'Task' . random_int(0, 65535);
+            $taskInput = new TaskInput([random_int(0, 65535)]);
 
             $prophet->taskInputMessageTransformerProphecy->getTaskClassFromMessage($inputMessage)->willReturn($taskClass);
             $prophet->taskInputMessageTransformerProphecy->getTaskInputFromMessage($inputMessage)->willReturn($taskInput);
@@ -96,8 +96,8 @@ class TaskRunnerTest extends \PHPUnit\Framework\TestCase
                     &$outputMessage,
                     $prophet
                 ) {
-                    $result = mt_rand(0, 65535);
-                    $outputMessage = new OutputMessage('output' . mt_rand(0, 65535));
+                    $result = random_int(0, 65535);
+                    $outputMessage = new OutputMessage('output' . random_int(0, 65535));
                     $taskResult = TaskResult::value($result);
                     $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult($taskResult)->willReturn($outputMessage);
                     return $taskResult;

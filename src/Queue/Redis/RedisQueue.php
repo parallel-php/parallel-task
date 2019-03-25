@@ -60,13 +60,13 @@ class RedisQueue extends NonCallbackConsumeQueue implements PublishQueue
 
     public function getInput(string $type): InputMessageWithIdentifier
     {
-        if (rand(0, 99) == 0) {
+        if (random_int(0, 99) === 0) {
             $this->requeueOldWorkingMessages($type);
         }
 
         do {
             $messageId = $this->redis->brpoplpush($this->getMessageQueueKey($type), $this->getMessageRunKey($type), 1);
-            if (empty($messageId) && rand(0, 9) == 0) {
+            if (empty($messageId) && random_int(0, 9) === 0) {
                 $this->requeueOldWorkingMessages($type);
             }
         } while (empty($messageId));
