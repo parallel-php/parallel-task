@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
+use ParallelTask\Queue\ConsumeQueue;
 use ParallelTask\Queue\InputMessage;
-use ParallelTask\Queue\Queue;
 
 final class TaskRunner
 {
-    /** @var Queue */
+    /** @var ConsumeQueue */
     private $queue;
 
     /** @var \Closure */
@@ -16,7 +18,7 @@ final class TaskRunner
     private $runnerSupervisor;
 
     public function __construct(
-        Queue $queue,
+        ConsumeQueue $queue,
         TaskInputMessageTransformer $taskInputMessageTransformer,
         TaskFactory $taskFactory,
         TaskResultMessageTransformer $taskResultMessageTransformer,
@@ -41,30 +43,25 @@ final class TaskRunner
         $this->runnerSupervisor = $runnerSupervisor;
     }
 
-    public function run($type)
+    public function run(string $type): void
     {
         $this->runnerSupervisor->markRunnerStart();
 
         while (true) {
             $this->queue->run($type, $this->taskRunCallback);
-            
+
             if ($this->runnerSupervisor->shouldRunnerStop()) {
                 break;
             }
         }
     }
 
-    public function runOnce($type)
+    public function runOnce(string $type): void
     {
         $this->queue->run($type, $this->taskRunCallback);
     }
 
-    /**
-     * @param Task $task
-     * @param TaskInput $taskInput
-     * @return TaskResult
-     */
-    private function runTask($task, TaskInput $taskInput)
+    private function runTask(Task $task, TaskInput $taskInput): TaskResult
     {
         try {
             $return = $task->run($taskInput);

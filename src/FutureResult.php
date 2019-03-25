@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask;
 
 use ParallelTask\Task\FutureTaskResult;
@@ -13,6 +15,10 @@ final class FutureResult
         $this->futureTaskResult = $futureTaskResult;
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
     public function getResult()
     {
         return $this->futureTaskResult->getTaskResult()->getResult();

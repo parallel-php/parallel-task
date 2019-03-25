@@ -8,13 +8,12 @@ use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
 use ParallelTask\Queue\OutputMessage;
 use ParallelTask\Queue\PublishQueue;
-use ParallelTask\Queue\Queue;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Ramsey\Uuid\Uuid;
 
-class RabbitMQQueue implements PublishQueue, ConsumeQueue, Queue
+class RabbitMQQueue implements PublishQueue, ConsumeQueue
 {
     /** @var AMQPStreamConnection */
     private $connection;

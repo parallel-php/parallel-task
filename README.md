@@ -14,13 +14,13 @@ How to use it:
 - Build the worker using queue and start it in a cli environment. You can start multiple workers.
 ```php
 $workerBuilder = new ExecutorWorkerBuilder()
-$worker = $workerBuilder->withQueue($queue)->buildWorker();
+$worker = $workerBuilder->withConsumeQueue($queue)->buildWorker();
 $worker->work($type);
 ```
 - Build the executor using queue
 ```php
 $executorBuilder = new ExecutorWorkerBuilder()
-$executor = $executorBuilder->withQueue($queue)->buildExecutor();
+$executor = $executorBuilder->withPublishQueue($queue)->buildExecutor();
 ```
 - Define a task by implementing the `Task` interface.
 - Submit task and get results
@@ -31,11 +31,11 @@ $result = $futureResult->getResult();
 ```
 
 Technically, the library is splitted into three parts:
-- Queue module. Handles queue implementation details. From outside, it contains a public interface `Queue` and the input/output entities from it's methods: `InputMessage`, `InputMessageIdentifier` and `OutputMessage`.
+- Queue module. Handles queue implementation details. From outside, it contains two public interfaces `PublishQueue` and `ConsumeQueue` and the input/output entities from it's methods: `InputMessage`, `InputMessageIdentifier` and `OutputMessage`.
   * `putInput` receives an `InputMessage` and store it for processing
   - `submitInput` receives an `InputMessage`, store it for processing and returns and `InputMessageIdentifier` for fetching the result.
-  - `run` receives a callable. It should fetch an `InputMessage`, run to callable with it as an input and stores the received `Output`.
   - `getOutput` receives an `InputMessageIdentifier` and returns the `OutputMessage` result for it. It's blocking until the result is available.
+  - `run` receives a callable. It should fetch an `InputMessage`, run to callable with it as an input and stores the received `Output`.
 
 - Task module. Uses Queue module adding a layer of `Task` implementation. From the outside, it has two classes with two interfaces: `TaskScheduler` and `TaskRunner` each of them used for scheduling a task for asynchronous run and respectively running tasks asynchronously.
 
@@ -49,4 +49,4 @@ Technically, the library is splitted into three parts:
 
 - Executor/Worker facade. It is just a wrapper around Task module to allow easier composition and usage.
 
-  There is a builder that helps creating `Executor` or `Worker` allowing to configure implementation for `Queue` and to change default implemention of `TaskInputMessageTransformer`, `TaskFactory`, `TaskResultMessageTransformer` and `TaskRunnerSupervisor`.
+  There is a builder that helps creating `Executor` or `Worker` allowing to configure implementation for `PublishQueue` and `ConsumeQueue` and to change default implementation of `TaskInputMessageTransformer`, `TaskFactory`, `TaskResultMessageTransformer` and `TaskRunnerSupervisor`.

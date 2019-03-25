@@ -9,10 +9,9 @@ use ParallelTask\Queue\InputMessageWithIdentifier;
 use ParallelTask\Queue\NonCallbackConsumeQueue;
 use ParallelTask\Queue\OutputMessage;
 use ParallelTask\Queue\PublishQueue;
-use ParallelTask\Queue\Queue;
 use Ramsey\Uuid\Uuid;
 
-class RedisQueue extends NonCallbackConsumeQueue implements PublishQueue, Queue
+class RedisQueue extends NonCallbackConsumeQueue implements PublishQueue
 {
     /**
      * @var int

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask;
 
 use ParallelTask\Task\TaskRunner;
@@ -13,10 +15,7 @@ final class Worker
         $this->taskRunner = $taskRunner;
     }
 
-    /**
-     * @param string $type
-     */
-    public function work($type)
+    public function work(string $type): void
     {
         $this->taskRunner->run($type);
     }

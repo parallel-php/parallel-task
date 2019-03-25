@@ -9,12 +9,11 @@ use ParallelTask\Queue\InputMessageWithIdentifier;
 use ParallelTask\Queue\NonCallbackConsumeQueue;
 use ParallelTask\Queue\OutputMessage;
 use ParallelTask\Queue\PublishQueue;
-use ParallelTask\Queue\Queue;
 use Predis\Client;
 use Predis\ClientContextInterface;
 use Ramsey\Uuid\Uuid;
 
-class PredisQueue extends NonCallbackConsumeQueue implements PublishQueue, Queue
+class PredisQueue extends NonCallbackConsumeQueue implements PublishQueue
 {
     /**
      * @var int

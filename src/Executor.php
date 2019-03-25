@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask;
 
 use ParallelTask\Task\TaskInput;
@@ -14,29 +16,17 @@ final class Executor
         $this->taskScheduler = $taskScheduler;
     }
 
-    /**
-     * @param string $type
-     * @param string $taskClass
-     * @param array $parameters
-     */
-    public function execute($type, $taskClass, $parameters)
+    public function execute(string $type, string $taskClass, array $parameters): void
     {
         $taskInput = new TaskInput($parameters);
         $this->taskScheduler->execute($type, $taskClass, $taskInput);
     }
 
-    /**
-     * @param string $type
-     * @param string $taskClass
-     * @param array $parameters
-     * @return FutureResult
-     */
-    public function submit($type, $taskClass, $parameters)
+    public function submit(string $type, string $taskClass, array $parameters): FutureResult
     {
         $taskInput = new TaskInput($parameters);
         $futureTaskResult = $this->taskScheduler->submit($type, $taskClass, $taskInput);
-        $futureResult = new FutureResult($futureTaskResult);
 
-        return $futureResult;
+        return new FutureResult($futureTaskResult);
     }
 }

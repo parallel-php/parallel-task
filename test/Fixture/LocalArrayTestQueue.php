@@ -8,9 +8,8 @@ use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
 use ParallelTask\Queue\OutputMessage;
 use ParallelTask\Queue\PublishQueue;
-use ParallelTask\Queue\Queue;
 
-class LocalArrayTestQueue implements PublishQueue, ConsumeQueue, Queue
+class LocalArrayTestQueue implements PublishQueue, ConsumeQueue
 {
     private $storageInput = [];
 
