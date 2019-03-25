@@ -1,14 +1,17 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Queue\Redis;
 
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\InputMessageIdentifier;
 use ParallelTask\Queue\InputMessageWithIdentifier;
-use ParallelTask\Queue\NonCallbackQueue;
+use ParallelTask\Queue\NonCallbackConsumeQueue;
 use ParallelTask\Queue\OutputMessage;
+use ParallelTask\Queue\PublishQueue;
 use Ramsey\Uuid\Uuid;
 
-class RedisQueue extends NonCallbackQueue
+class RedisQueue extends NonCallbackConsumeQueue implements PublishQueue
 {
     /**
      * @var int
@@ -25,11 +28,7 @@ class RedisQueue extends NonCallbackQueue
         $this->redis = $redis;
     }
 
-    /**
-     * @param $type
-     * @param InputMessage $inputMessage
-     */
-    public function putInput($type, InputMessage $inputMessage)
+    public function putInput(string $type, InputMessage $inputMessage): void
     {
         $id = Uuid::uuid4()->toString();
         $data = $inputMessage->getData();
@@ -37,12 +36,7 @@ class RedisQueue extends NonCallbackQueue
         $this->storeInput($type, $id, $data, false);
     }
 
-    /**
-     * @param $type
-     * @param InputMessage $inputMessage
-     * @return InputMessageIdentifier
-     */
-    public function submitInput($type, InputMessage $inputMessage)
+    public function submitInput(string $type, InputMessage $inputMessage): InputMessageIdentifier
     {
         $id = Uuid::uuid4()->toString();
         $data = $inputMessage->getData();
@@ -64,11 +58,7 @@ class RedisQueue extends NonCallbackQueue
         $this->redis->exec();
     }
 
-    /**
-     * @param string $type
-     * @return InputMessageWithIdentifier
-     */
-    public function getInput($type)
+    public function getInput(string $type): InputMessageWithIdentifier
     {
         if (rand(0, 99) == 0) {
             $this->requeueOldWorkingMessages($type);
@@ -89,12 +79,7 @@ class RedisQueue extends NonCallbackQueue
         return new InputMessageWithIdentifier($identifier, $inputMessage);
     }
 
-    /**
-     * @param string $type
-     * @param InputMessageIdentifier $identifier
-     * @param OutputMessage $outputMessage
-     */
-    public function putOutput($type, InputMessageIdentifier $identifier, OutputMessage $outputMessage)
+    public function putOutput(string $type, InputMessageIdentifier $identifier, OutputMessage $outputMessage): void
     {
         $messageId = $identifier->getId();
 
@@ -119,7 +104,7 @@ class RedisQueue extends NonCallbackQueue
      * @param InputMessageIdentifier $identifier
      * @return OutputMessage
      */
-    public function getOutput($type, InputMessageIdentifier $identifier)
+    public function getOutput(string $type, InputMessageIdentifier $identifier): OutputMessage
     {
         $messageId = $identifier->getId();
 

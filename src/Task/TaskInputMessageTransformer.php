@@ -1,26 +1,15 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 use ParallelTask\Queue\InputMessage;
 
 interface TaskInputMessageTransformer
 {
-    /**
-     * @param string $taskClass
-     * @param TaskInput $taskInput
-     * @return InputMessage
-     */
-    public function getInputMessageFromTaskInput($taskClass, TaskInput $taskInput);
+    public function getInputMessageFromTaskInput(string $taskClass, TaskInput $taskInput): InputMessage;
 
-    /**
-     * @param InputMessage $message
-     * @return string
-     */
-    public function getTaskClassFromMessage(InputMessage $message);
+    public function getTaskClassFromMessage(InputMessage $message): string;
 
-    /**
-     * @param InputMessage $message
-     * @return TaskInput
-     */
-    public function getTaskInputFromMessage(InputMessage $message);
+    public function getTaskInputFromMessage(InputMessage $message): TaskInput;
 }

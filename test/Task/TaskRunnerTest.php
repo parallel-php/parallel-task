@@ -1,13 +1,15 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
+use ParallelTask\Queue\ConsumeQueue;
 use ParallelTask\Queue\InputMessage;
 use ParallelTask\Queue\OutputMessage;
-use ParallelTask\Queue\Queue;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class TaskRunnerTest extends \PHPUnit_Framework_TestCase
+class TaskRunnerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectProphecy */
     private $queueProphecy;
@@ -24,7 +26,7 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->queueProphecy = $this->prophesize(Queue::class);
+        $this->queueProphecy = $this->prophesize(ConsumeQueue::class);
         $this->taskInputMessageTransformerProphecy = $this->prophesize(TaskInputMessageTransformer::class);
         $this->taskFactoryProphecy = $this->prophesize(TaskFactory::class);
         $this->taskResultMessageTransformerProphecy = $this->prophesize(TaskResultMessageTransformer::class);
@@ -39,19 +41,21 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testRunOnce() {
+    public function testRunOnce()
+    {
         $type = 'testType';
         $queueRunMethodProphecy = $this->createPropheciesForTaskRunnerRun($type);
         $queueRunMethodProphecy->shouldBeCalledTimes(1);
         $this->sut->runOnce($type);
     }
 
-    public function testRun() {
+    public function testRun()
+    {
         $type = 'testType';
-        $this->taskRunnerSupervisorProphecy->markRunnerStart()->willReturn();
-        $this->taskRunnerSupervisorProphecy->shouldRunnerStop()->will(function (){
-            $this->shouldRunnerStop()->will(function (){
-                $this->shouldRunnerStop()->will(function (){
+        $this->taskRunnerSupervisorProphecy->markRunnerStart();
+        $this->taskRunnerSupervisorProphecy->shouldRunnerStop()->will(function () {
+            $this->shouldRunnerStop()->will(function () {
+                $this->shouldRunnerStop()->will(function () {
                     $this->shouldRunnerStop()->willReturn(true);
                     return false;
                 });
@@ -94,8 +98,9 @@ class TaskRunnerTest extends \PHPUnit_Framework_TestCase
                 ) {
                     $result = mt_rand(0, 65535);
                     $outputMessage = new OutputMessage('output' . mt_rand(0, 65535));
-                    $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult(TaskResult::fromReturn($result))->willReturn($outputMessage);
-                    return $result;
+                    $taskResult = TaskResult::value($result);
+                    $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult($taskResult)->willReturn($outputMessage);
+                    return $taskResult;
                 });
 
                 $taskRunMethodProphecy->shouldBeCalledTimes(1);

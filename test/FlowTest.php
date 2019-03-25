@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use ParallelTask\Fixture\LocalArrayTestQueue;
 use ParallelTask\Fixture\TestTask;
@@ -8,7 +9,7 @@ use ParallelTask\Task\TaskRunner;
 use ParallelTask\Task\TaskRunnerNullSupervisor;
 use ParallelTask\Task\TaskScheduler;
 
-class FlowTest extends \PHPUnit_Framework_TestCase
+class FlowTest extends \PHPUnit\Framework\TestCase
 {
     public function testFlowSuccess()
     {
@@ -47,7 +48,7 @@ class FlowTest extends \PHPUnit_Framework_TestCase
 
         $futureResult = $executor->submit('testType', TestTask::class, $parameters);
         $taskRunner->runOnce('testType');
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\RuntimeException::class);
         $futureResult->getResult();
     }
 }

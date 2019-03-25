@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 interface TaskRunnerSupervisor
@@ -6,11 +8,10 @@ interface TaskRunnerSupervisor
     /**
      * Initiate the supervisor. The method will be called just before starting the infinite loop.
      */
-    public function markRunnerStart();
+    public function markRunnerStart(): void;
 
     /**
      * Checks if the task runner should stop processing messages. The method will be called after processing each message.
-     * @return bool
      */
-    public function shouldRunnerStop();
+    public function shouldRunnerStop(): bool;
 }

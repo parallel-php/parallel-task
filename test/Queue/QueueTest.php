@@ -1,28 +1,29 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Queue;
 
-abstract class QueueTest extends \PHPUnit_Framework_TestCase
+abstract class QueueTest extends \PHPUnit\Framework\TestCase
 {
 
-    /** @var Queue */
-    private $queueClient;
+    /** @var PublishQueue */
+    private $publishQueue;
 
-    /** @var Queue */
-    private $queueServer;
+    /** @var ConsumeQueue */
+    private $consumeQueue;
 
     protected function setUp()
     {
-        $this->queueClient = $this->getQueueInstance();
-        $this->queueServer = $this->getQueueInstance();
+        $this->publishQueue = $this->getQueueInstance();
+        $this->consumeQueue = $this->getQueueInstance();
     }
 
     protected function tearDown()
     {
-        unset($this->queueClient);
-        unset($this->queueServer);
+        unset($this->publishQueue, $this->consumeQueue);
     }
 
-    /** @return Queue */
+    /** @return PublishQueue|ConsumeQueue */
     abstract protected function getQueueInstance();
 
     public function testPutRun()
@@ -32,9 +33,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $inputMessage = new InputMessage($data);
 
-        $this->queueClient->putInput($type, $inputMessage);
+        $this->publishQueue->putInput($type, $inputMessage);
 
-        $this->queueServer->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture) {
+        $this->consumeQueue->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture) {
             $inputMessageCapture = $inputMessage;
             return new OutputMessage(null);
         });
@@ -49,9 +50,9 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $inputMessage = new InputMessage($data);
 
-        $identifier = $this->queueClient->submitInput($type, $inputMessage);
+        $identifier = $this->publishQueue->submitInput($type, $inputMessage);
 
-        $this->queueServer->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture, &$outputMessageCapture) {
+        $this->consumeQueue->run($type, function (InputMessage $inputMessage) use (&$inputMessageCapture, &$outputMessageCapture) {
             $data = substr($inputMessage->getData(), 0, -2) . 'out';
             $outputMessage = new OutputMessage($data);
             $inputMessageCapture = $inputMessage;
@@ -59,7 +60,7 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
             return $outputMessage;
         });
 
-        $outputMessage = $this->queueClient->getOutput($type, $identifier);
+        $outputMessage = $this->publishQueue->getOutput($type, $identifier);
 
         $this->assertEquals($inputMessage->getData(), $inputMessageCapture->getData());
         $this->assertEquals($outputMessage->getData(), $outputMessageCapture->getData());
@@ -86,25 +87,25 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         };
 
         $inputMessage = new InputMessage($data0);
-        $identifier = $this->queueClient->submitInput($type, $inputMessage);
-        $this->queueServer->run($type, $runCallback);
-        $outputMessage = $this->queueClient->getOutput($type, $identifier);
+        $identifier = $this->publishQueue->submitInput($type, $inputMessage);
+        $this->consumeQueue->run($type, $runCallback);
+        $outputMessage = $this->publishQueue->getOutput($type, $identifier);
 
         $this->assertEquals($inputMessage->getData(), $inputMessageCapture->getData());
         $this->assertEquals($outputMessage->getData(), $outputMessageCapture->getData());
 
         $inputMessage1 = new InputMessage($data1);
         $inputMessage2 = new InputMessage($data2);
-        $identifier1 = $this->queueClient->submitInput($type, $inputMessage1);
-        $identifier2 = $this->queueClient->submitInput($type, $inputMessage2);
-        $this->queueServer->run($type, $runCallback);
+        $identifier1 = $this->publishQueue->submitInput($type, $inputMessage1);
+        $identifier2 = $this->publishQueue->submitInput($type, $inputMessage2);
+        $this->consumeQueue->run($type, $runCallback);
         $inputMessageCapture1 = $inputMessageCapture;
         $outputMessageCapture1 = $outputMessageCapture;
-        $this->queueServer->run($type, $runCallback);
+        $this->consumeQueue->run($type, $runCallback);
         $inputMessageCapture2 = $inputMessageCapture;
         $outputMessageCapture2 = $outputMessageCapture;
-        $outputMessage1 = $this->queueClient->getOutput($type, $identifier1);
-        $outputMessage2 = $this->queueClient->getOutput($type, $identifier2);
+        $outputMessage1 = $this->publishQueue->getOutput($type, $identifier1);
+        $outputMessage2 = $this->publishQueue->getOutput($type, $identifier2);
 
         $this->assertEquals($inputMessage1->getData(), $inputMessageCapture1->getData());
         $this->assertEquals($outputMessage1->getData(), $outputMessageCapture1->getData());
@@ -128,12 +129,12 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
 
         $inputMessage1 = new InputMessage($dataIn1);
         $inputMessage2 = new InputMessage($dataIn2);
-        $identifier1 = $this->queueClient->submitInput($type, $inputMessage1);
-        $identifier2 = $this->queueClient->submitInput($type, $inputMessage2);
-        $this->queueServer->run($type, $runCallback);
-        $this->queueServer->run($type, $runCallback);
-        $outputMessage2 = $this->queueClient->getOutput($type, $identifier2);
-        $outputMessage1 = $this->queueClient->getOutput($type, $identifier1);
+        $identifier1 = $this->publishQueue->submitInput($type, $inputMessage1);
+        $identifier2 = $this->publishQueue->submitInput($type, $inputMessage2);
+        $this->consumeQueue->run($type, $runCallback);
+        $this->consumeQueue->run($type, $runCallback);
+        $outputMessage2 = $this->publishQueue->getOutput($type, $identifier2);
+        $outputMessage1 = $this->publishQueue->getOutput($type, $identifier1);
 
         $this->assertEquals($dataOut2, $outputMessage2->getData());
         $this->assertEquals($dataOut1, $outputMessage1->getData());
@@ -155,14 +156,14 @@ abstract class QueueTest extends \PHPUnit_Framework_TestCase
         };
 
         $inputMessage1 = new InputMessage($dataIn1);
-        $identifier1 = $this->queueClient->submitInput($type, $inputMessage1);
-        $this->queueServer->run($type, $runCallback1);
-        $outputMessage1 = $this->queueClient->getOutput($type, $identifier1);
+        $identifier1 = $this->publishQueue->submitInput($type, $inputMessage1);
+        $this->consumeQueue->run($type, $runCallback1);
+        $outputMessage1 = $this->publishQueue->getOutput($type, $identifier1);
 
         $inputMessage2 = new InputMessage($dataIn2);
-        $identifier2 = $this->queueClient->submitInput($type, $inputMessage2);
-        $this->queueServer->run($type, $runCallback2);
-        $outputMessage2 = $this->queueClient->getOutput($type, $identifier2);
+        $identifier2 = $this->publishQueue->submitInput($type, $inputMessage2);
+        $this->consumeQueue->run($type, $runCallback2);
+        $outputMessage2 = $this->publishQueue->getOutput($type, $identifier2);
 
         $this->assertEquals($dataOut1, $outputMessage1->getData());
         $this->assertEquals($dataOut2, $outputMessage2->getData());

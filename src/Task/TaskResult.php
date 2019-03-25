@@ -1,16 +1,20 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 final class TaskResult
 {
-    private $return;
+    /** @var mixed */
+    private $value;
+    /** @var \Exception */
     private $exception;
 
     private function __construct()
     {
     }
 
-    public static function fromException(\Exception $exception)
+    public static function exception(\Exception $exception): TaskResult
     {
         $taskResult = new TaskResult();
         $taskResult->exception = $exception;
@@ -18,19 +22,23 @@ final class TaskResult
         return $taskResult;
     }
 
-    public static function fromReturn($return)
+    public static function value($value): TaskResult
     {
         $taskResult = new TaskResult();
-        $taskResult->return = $return;
+        $taskResult->value = $value;
 
         return $taskResult;
     }
 
-    public function getResult()
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function get()
     {
         if ($this->exception instanceof \Exception) {
             throw $this->exception;
         }
-        return $this->return;
+        return $this->value;
     }
 }

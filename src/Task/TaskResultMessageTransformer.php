@@ -1,19 +1,13 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 use ParallelTask\Queue\OutputMessage;
 
 interface TaskResultMessageTransformer
 {
-    /**
-     * @param TaskResult $taskResult
-     * @return OutputMessage
-     */
-    public function getOutputMessageFromResult(TaskResult $taskResult);
+    public function getOutputMessageFromResult(TaskResult $taskResult): OutputMessage;
 
-    /**
-     * @param OutputMessage $message
-     * @return TaskResult
-     */
-    public function getTaskResultFromMessage(OutputMessage $message);
+    public function getTaskResultFromMessage(OutputMessage $message): TaskResult;
 }

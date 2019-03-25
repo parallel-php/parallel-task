@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
+use ParallelTask\Queue\ConsumeQueue;
 use ParallelTask\Queue\InputMessage;
-use ParallelTask\Queue\Queue;
 
 final class TaskRunner
 {
-    /** @var Queue */
+    /** @var ConsumeQueue */
     private $queue;
 
     /** @var \Closure */
@@ -28,7 +30,7 @@ final class TaskRunner
     private $taskResultMessageTransformer;
 
     public function __construct(
-        Queue $queue,
+        ConsumeQueue $queue,
         TaskInputMessageTransformer $taskInputMessageTransformer,
         TaskFactory $taskFactory,
         TaskResultMessageTransformer $taskResultMessageTransformer,
@@ -52,7 +54,7 @@ final class TaskRunner
 
     }
 
-    public function run($type)
+    public function run(string $type): void
     {
         $this->runnerSupervisor->markRunnerStart();
 
@@ -65,7 +67,7 @@ final class TaskRunner
         }
     }
 
-    public function runOnce($type)
+    public function runOnce(string $type): void
     {
         $this->queue->run($type, $this->taskRunCallback);
     }
@@ -90,18 +92,16 @@ final class TaskRunner
         return $this->taskFactory->createTask($taskClass);
     }
 
-    /**
-     * @param Task $task
-     * @param TaskInput $taskInput
-     * @return TaskResult
-     */
-    private function runTask($task, TaskInput $taskInput)
+    private function runTask(Task $task, TaskInput $taskInput): TaskResult
     {
         try {
-            $return = $task->run($taskInput);
-            return TaskResult::fromReturn($return);
+            $value = $task->run($taskInput);
+            if ($value === null) {
+                return TaskResult::value(null);
+            }
+            return $value;
         } catch (\Exception $exception) {
-            return TaskResult::fromException($exception);
+            return TaskResult::exception($exception);
         }
     }
 }

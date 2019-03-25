@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 use ParallelTask\Queue\InputMessageIdentifier;
-use ParallelTask\Queue\Queue;
+use ParallelTask\Queue\PublishQueue;
 
 final class TaskScheduler
 {
-    /** @var Queue */
+    /** @var PublishQueue */
     private $queue;
 
     /** @var TaskInputMessageTransformer */
@@ -15,31 +17,20 @@ final class TaskScheduler
     /** @var TaskResultMessageTransformer */
     private $taskResultMessageTransformer;
 
-    public function __construct(Queue $queue, TaskInputMessageTransformer $taskInputMessageTransformer, TaskResultMessageTransformer $taskResultMessageTransformer)
+    public function __construct(PublishQueue $queue, TaskInputMessageTransformer $taskInputMessageTransformer, TaskResultMessageTransformer $taskResultMessageTransformer)
     {
         $this->queue = $queue;
         $this->taskInputMessageTransformer = $taskInputMessageTransformer;
         $this->taskResultMessageTransformer = $taskResultMessageTransformer;
     }
 
-    /**
-     * @param string $type
-     * @param string $taskClass
-     * @param TaskInput $taskInput
-     */
-    public function execute($type, $taskClass, TaskInput $taskInput)
+    public function execute(string $type, string $taskClass, TaskInput $taskInput): void
     {
         $inputMessage = $this->taskInputMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
         $this->queue->putInput($type, $inputMessage);
     }
 
-    /**
-     * @param string $type
-     * @param string $taskClass
-     * @param TaskInput $taskInput
-     * @return FutureTaskResult
-     */
-    public function submit($type, $taskClass, TaskInput $taskInput)
+    public function submit(string $type, string $taskClass, TaskInput $taskInput): FutureTaskResult
     {
         $inputMessage = $this->taskInputMessageTransformer->getInputMessageFromTaskInput($taskClass, $taskInput);
         $identifier = $this->queue->submitInput($type, $inputMessage);
@@ -56,11 +47,10 @@ final class TaskScheduler
      * @param InputMessageIdentifier $identifier
      * @return TaskResult
      */
-    private function getTaskResult($type, InputMessageIdentifier $identifier)
+    private function getTaskResult(string $type, InputMessageIdentifier $identifier): TaskResult
     {
         $outputMessage = $this->queue->getOutput($type, $identifier);
-        $taskResult = $this->taskResultMessageTransformer->getTaskResultFromMessage($outputMessage);
 
-        return $taskResult;
+        return $this->taskResultMessageTransformer->getTaskResultFromMessage($outputMessage);
     }
 }

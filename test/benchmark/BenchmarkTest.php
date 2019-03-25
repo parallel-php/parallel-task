@@ -8,7 +8,7 @@ use ParallelTask\Task\TaskScheduler;
 use Symfony\Component\Process\Process;
 use TimeBenchmark\Stopwatch;
 
-class BenchmarkTest extends \PHPUnit_Framework_TestCase
+class BenchmarkTest extends \PHPUnit\Framework\TestCase
 {
     public function testSpeed()
     {
