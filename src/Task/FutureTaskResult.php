@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 final class FutureTaskResult
 {
+    /** @var TaskResult */
     private $taskResult;
     /** @var \Closure */
     private $taskResultCallback;
@@ -14,14 +17,10 @@ final class FutureTaskResult
         $this->taskResultCallback = $taskResultCallback;
     }
 
-    /**
-     * @return TaskResult
-     */
-    public function getTaskResult()
+    public function getTaskResult(): TaskResult
     {
         if (!$this->taskResultCallbackSolved) {
-            $taskResultCallback = $this->taskResultCallback;
-            $this->taskResult = $taskResultCallback();
+            $this->taskResult = ($this->taskResultCallback)();
             $this->taskResultCallbackSolved = true;
         }
 

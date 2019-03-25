@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ParallelTask\Task;
 
@@ -51,7 +52,7 @@ class TaskRunnerTest extends \PHPUnit\Framework\TestCase
     public function testRun()
     {
         $type = 'testType';
-        $this->taskRunnerSupervisorProphecy->markRunnerStart()->willReturn();
+        $this->taskRunnerSupervisorProphecy->markRunnerStart();
         $this->taskRunnerSupervisorProphecy->shouldRunnerStop()->will(function () {
             $this->shouldRunnerStop()->will(function () {
                 $this->shouldRunnerStop()->will(function () {
@@ -97,8 +98,9 @@ class TaskRunnerTest extends \PHPUnit\Framework\TestCase
                 ) {
                     $result = mt_rand(0, 65535);
                     $outputMessage = new OutputMessage('output' . mt_rand(0, 65535));
-                    $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult(TaskResult::fromReturn($result))->willReturn($outputMessage);
-                    return $result;
+                    $taskResult = TaskResult::value($result);
+                    $prophet->taskResultMessageTransformerProphecy->getOutputMessageFromResult($taskResult)->willReturn($outputMessage);
+                    return $taskResult;
                 });
 
                 $taskRunMethodProphecy->shouldBeCalledTimes(1);

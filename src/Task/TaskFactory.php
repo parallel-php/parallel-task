@@ -1,11 +1,9 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 interface TaskFactory
 {
-    /**
-     * @param string $taskClass
-     * @return Task
-     */
-    public function createTask($taskClass);
+    public function createTask(string $taskClass): Task;
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 final class TaskRunnerProcessSupervisor implements TaskRunnerSupervisor
@@ -23,13 +25,13 @@ final class TaskRunnerProcessSupervisor implements TaskRunnerSupervisor
         $this->maxMemoryIncrease = $maxMemoryIncrease;
     }
 
-    public function markRunnerStart()
+    public function markRunnerStart(): void
     {
         $this->startTime = time();
         $this->startMemoryUsage = memory_get_usage();
     }
 
-    public function shouldRunnerStop()
+    public function shouldRunnerStop(): bool
     {
         $peakMemoryUsage = memory_get_peak_usage();
         if ($peakMemoryUsage > $this->startMemoryUsage + $this->maxMemoryIncrease) {

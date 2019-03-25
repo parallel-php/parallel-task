@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 final class TaskInput implements \ArrayAccess
@@ -14,12 +16,12 @@ final class TaskInput implements \ArrayAccess
     /**
      * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->parameters[$offset]);
     }
@@ -31,11 +33,11 @@ final class TaskInput implements \ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        throw new \Exception('Input parameters are read-only');
+        throw new \RuntimeException('Task input parameters are read-only');
     }
 
     public function offsetUnset($offset)
     {
-        throw new \Exception('Input parameters are read-only');
+        throw new \RuntimeException('Task input parameters are read-only');
     }
 }

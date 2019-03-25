@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 use ParallelTask\Queue\InputMessage;
@@ -6,7 +8,7 @@ use ParallelTask\Queue\OutputMessage;
 
 final class TaskMessageSerializeTransformer implements TaskInputMessageTransformer, TaskResultMessageTransformer
 {
-    public function getInputMessageFromTaskInput($taskClass, TaskInput $taskInput)
+    public function getInputMessageFromTaskInput(string $taskClass, TaskInput $taskInput): InputMessage
     {
         $taskClassLength = strlen($taskClass);
         $paddedTaskClassLength = str_pad(dechex($taskClassLength), 4, '0', STR_PAD_LEFT);
@@ -23,7 +25,7 @@ final class TaskMessageSerializeTransformer implements TaskInputMessageTransform
         return new InputMessage($data);
     }
 
-    public function getTaskClassFromMessage(InputMessage $message)
+    public function getTaskClassFromMessage(InputMessage $message): string
     {
         $data = $message->getData();
 
@@ -35,7 +37,7 @@ final class TaskMessageSerializeTransformer implements TaskInputMessageTransform
         return $taskClass;
     }
 
-    public function getTaskInputFromMessage(InputMessage $message)
+    public function getTaskInputFromMessage(InputMessage $message): TaskInput
     {
         $data = $message->getData();
 
@@ -48,13 +50,13 @@ final class TaskMessageSerializeTransformer implements TaskInputMessageTransform
         return new TaskInput($parameters);
     }
 
-    public function getOutputMessageFromResult(TaskResult $taskResult)
+    public function getOutputMessageFromResult(TaskResult $taskResult): OutputMessage
     {
         try {
-            $return = $taskResult->getResult();
-            $serializedReturn = serialize($return);
+            $value = $taskResult->get();
+            $serializedValue = serialize($value);
 
-            $data = 'r' . $serializedReturn;
+            $data = 'r' . $serializedValue;
         } catch (\Exception $exception) {
             $serializedException = serialize([
                 get_class($exception),
@@ -70,7 +72,7 @@ final class TaskMessageSerializeTransformer implements TaskInputMessageTransform
         return new OutputMessage($data);
     }
 
-    public function getTaskResultFromMessage(OutputMessage $message)
+    public function getTaskResultFromMessage(OutputMessage $message): TaskResult
     {
         $data = $message->getData();
 
@@ -78,38 +80,33 @@ final class TaskMessageSerializeTransformer implements TaskInputMessageTransform
         $serializedData = substr($data, 1);
 
         if ($type === 'r') {
-            $return = unserialize($serializedData);
+            $value = unserialize($serializedData);
 
-            $taskResult = TaskResult::fromReturn($return);
+            $taskResult = TaskResult::value($value);
         } elseif ($type === 'e') {
-            list(
+            [
                 $class,
                 $message,
                 $code,
                 $file,
                 $line,
-                ) = unserialize($serializedData);
+            ] = unserialize($serializedData);
 
             $exception = $this->createResultException($class);
             $this->setResultExceptionInternalData($exception, $class, $message, $code, $file, $line);
 
-            $taskResult = TaskResult::fromException($exception);
+            $taskResult = TaskResult::exception($exception);
         } else {
-            $taskResult = TaskResult::fromReturn(null);
+            $taskResult = TaskResult::value(null);
         }
 
         return $taskResult;
     }
 
-    /**
-     * @param string $class
-     * @return \Exception
-     */
-    private function createResultException($class)
+    private function createResultException(string $class): \Exception
     {
         $instantiator = new \Doctrine\Instantiator\Instantiator();
-        $exception = $instantiator->instantiate($class);
-        return $exception;
+        return $instantiator->instantiate($class);
     }
 
     private function setResultExceptionInternalData(\Exception $exception, $class, $message, $code, $file, $line)

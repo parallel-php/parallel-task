@@ -21,6 +21,6 @@ final class FutureResult
      */
     public function getResult()
     {
-        return $this->futureTaskResult->getTaskResult()->getResult();
+        return $this->futureTaskResult->getTaskResult()->get();
     }
 }

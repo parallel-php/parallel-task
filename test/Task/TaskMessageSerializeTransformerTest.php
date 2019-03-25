@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ParallelTask\Task;
 
 use ParallelTask\Fixture\TestException;
@@ -14,14 +16,14 @@ class TaskMessageSerializeTransformerTest extends \PHPUnit\Framework\TestCase
         $code = 123;
         $exception = new TestException($message, $code);
 
-        $taskResult = TaskResult::fromException($exception);
+        $taskResult = TaskResult::exception($exception);
 
         $message = $sut->getOutputMessageFromResult($taskResult);
 
         $taskResult2 = $sut->getTaskResultFromMessage($message);
 
         try {
-            $taskResult2->getResult();
+            $taskResult2->get();
             $this->fail('No exception was thrown');
         } catch (TestException $exception2) {
         }

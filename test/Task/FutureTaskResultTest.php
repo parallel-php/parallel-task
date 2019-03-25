@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ParallelTask\Task;
 
@@ -7,8 +8,9 @@ class FutureTaskResultTest extends \PHPUnit\Framework\TestCase
     public function testResolvingFutureCallable()
     {
         $callbackTestValue = '';
-        $callback = function () use (&$callbackTestValue){
+        $callback = function () use (&$callbackTestValue) {
             $callbackTestValue = 'called';
+            return TaskResult::value(null);
         };
 
         $callbackTestValue = 'not called';

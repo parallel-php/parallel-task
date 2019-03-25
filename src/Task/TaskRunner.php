@@ -64,10 +64,13 @@ final class TaskRunner
     private function runTask(Task $task, TaskInput $taskInput): TaskResult
     {
         try {
-            $return = $task->run($taskInput);
-            return TaskResult::fromReturn($return);
+            $value = $task->run($taskInput);
+            if ($value === null) {
+                return TaskResult::value(null);
+            }
+            return $value;
         } catch (\Exception $exception) {
-            return TaskResult::fromException($exception);
+            return TaskResult::exception($exception);
         }
     }
 }
