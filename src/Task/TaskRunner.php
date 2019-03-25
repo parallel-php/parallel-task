@@ -16,18 +16,6 @@ final class TaskRunner
 
     /** @var TaskRunnerSupervisor */
     private $runnerSupervisor;
-    /**
-     * @var TaskInputMessageTransformer
-     */
-    private $taskInputMessageTransformer;
-    /**
-     * @var TaskFactory
-     */
-    private $taskFactory;
-    /**
-     * @var TaskResultMessageTransformer
-     */
-    private $taskResultMessageTransformer;
 
     public function __construct(
         ConsumeQueue $queue,
@@ -37,21 +25,23 @@ final class TaskRunner
         TaskRunnerSupervisor $runnerSupervisor
     ) {
         $this->queue = $queue;
-        $this->runnerSupervisor = $runnerSupervisor;
-        $this->taskInputMessageTransformer = $taskInputMessageTransformer;
-        $this->taskFactory = $taskFactory;
-        $this->taskResultMessageTransformer = $taskResultMessageTransformer;
 
         $this->taskRunCallback = function (
             InputMessage $inputMessage
+        ) use (
+            $taskInputMessageTransformer,
+            $taskFactory,
+            $taskResultMessageTransformer
         ) {
             $this->checkInputMessage($inputMessage);
-
-            $outputMessage = $this->processInputMessage($inputMessage);
-
-            return $outputMessage;
+            $taskClass = $taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
+            $task = $taskFactory->createTask($taskClass);
+            $taskInput = $taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
+            $taskResult = $this->runTask($task, $taskInput);
+            return $taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
         };
 
+        $this->runnerSupervisor = $runnerSupervisor;
     }
 
     public function run(string $type): void
@@ -74,22 +64,6 @@ final class TaskRunner
 
     private function checkInputMessage($inputMessage)
     {
-    }
-
-    private function processInputMessage($inputMessage)
-    {
-        $task = $this->getTask($inputMessage);
-        $taskInput = $this->taskInputMessageTransformer->getTaskInputFromMessage($inputMessage);
-        $taskResult = $this->runTask($task, $taskInput);
-
-        return $this->taskResultMessageTransformer->getOutputMessageFromResult($taskResult);
-    }
-
-    private function getTask($inputMessage)
-    {
-        $taskClass = $this->taskInputMessageTransformer->getTaskClassFromMessage($inputMessage);
-
-        return $this->taskFactory->createTask($taskClass);
     }
 
     private function runTask(Task $task, TaskInput $taskInput): TaskResult
